@@ -161,19 +161,20 @@ inline error_ptr wrap(errors::error_ptr &&cause,
 #if not defined(ERRORS_DISABLE_OSTREAM)
 inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 {
-        auto current_err = err.get();
-        if (!current_err) {
-                os << "success";
-                return os;
-        }
-        os << current_err->what().value_or("");
-
-        for (current_err = current_err->cause().get(); current_err != nullptr;
+        bool first = true;
+        for (auto current_err = err.get(); current_err != nullptr;
              current_err = current_err->cause().get()) {
-                if (!current_err->what()) {
-                        continue;
+                if (!current_err) {
+                        os << "success";
+                        return os;
                 }
-                os << ": " << *current_err->what();
+                if (!first) {
+                        os << ": ";
+                }
+                if (current_err->what()) {
+                        os << *current_err->what();
+                        first = false;
+                }
         }
         return os;
 }
