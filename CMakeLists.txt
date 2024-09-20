@@ -98,7 +98,7 @@ pfl_add_library(
   basic-usage
   customize-format-global
   customize-format-local
-  print-messages
+  error-handling
   use-with-expected
   TESTS
   errors-unit-tests

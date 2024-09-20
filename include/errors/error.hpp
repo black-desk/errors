@@ -18,8 +18,7 @@
 namespace errors
 {
 
-class context {
-    public:
+struct context {
 #if defined(ERRORS_ENABLE_SOURCE_LOCATION)
         context(source_location location = source_location::current())
                 : location{ location }
@@ -89,69 +88,69 @@ class base_error : public virtual error {
 
 class common_error : public base_error, public virtual error {
     public:
-        class context : public errors::context {
-            public:
-                context(char const *message
+        struct context_t : public errors::context {
 #if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                        ,
-                        source_location location = source_location::current()
-#endif
-                                )
-                        : errors::context{
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                                location
-#endif
-                        }
+                context_t(char const *message,
+                          source_location location = source_location::current())
+                        : errors::context{ location }
                 {
                         if (message != nullptr) {
                                 this->message = message;
                         }
                 }
-                context(std::string message
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                        ,
-                        source_location location = source_location::current()
-#endif
-                                )
-                        : errors::context{
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                                location
-#endif
-                        },message{std::move(message)}
+                context_t(std::string message,
+                          source_location location = source_location::current())
+                        : errors::context{ location }
+                        , message{ std::move(message) }
                 {
                 }
-
+#else
+                context_t(char const *message)
+                        : errors::context{}
+                {
+                        if (message != nullptr) {
+                                this->message = message;
+                        }
+                }
+                context_t(std::string message)
+                        : errors::context{}
+                        , message{ std::move(message) }
+                {
+                }
+#endif
                 std::optional<std::string> message;
         };
-        common_error(context context, error_ptr &&cause = nullptr)
+
+        common_error(context_t context, error_ptr &&cause = nullptr)
                 : base_error(std::move(cause))
-                , context_(std::move(context))
+                , context(std::move(context))
         {
+        }
+
+        std::optional<std::string> what() const override
+        {
+                return this->context.message;
         }
 
 #if defined(ERRORS_ENABLE_SOURCE_LOCATION)
         const source_location &location() const override
         {
-                return this->context_.location;
+                return this->context.location;
         }
 #endif
-        std::optional<std::string> what() const override
-        {
-                return this->context_.message;
-        }
 
     private:
-        context context_;
+        context_t context;
 };
 
 template <typename E, typename... Args>
-inline error_ptr make_error(typename E::context ctx, Args &&...args)
+inline error_ptr make_error(typename E::context_t ctx, Args &&...args)
 {
         return std::make_unique<E>(std::move(ctx), std::forward<Args>(args)...);
 }
 
 inline error_ptr wrap(errors::error_ptr &&cause,
-                      common_error::context ctx = { nullptr })
+                      common_error::context_t ctx = { nullptr })
 {
         return make_error<common_error>(std::move(ctx), std::move(cause));
 }
@@ -161,20 +160,22 @@ inline error_ptr wrap(errors::error_ptr &&cause,
 #if not defined(ERRORS_DISABLE_OSTREAM)
 inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 {
-        bool first = true;
+        bool printed = false;
         for (auto current_err = err.get(); current_err != nullptr;
              current_err = current_err->cause().get()) {
                 if (!current_err) {
                         os << "success";
                         return os;
                 }
-                if (!first) {
+                if (printed) {
                         os << ": ";
+                        printed = false;
                 }
-                if (current_err->what()) {
-                        os << *current_err->what();
-                        first = false;
+                if (!current_err->what()) {
+                        continue;
                 }
+                os << *current_err->what();
+                printed = true;
         }
         return os;
 }
