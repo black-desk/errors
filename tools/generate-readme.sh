@@ -66,7 +66,9 @@ cd ..
 podman run -it --rm \
 	-v "$PWD:/data" \
 	docker.io/blackdesk/pandocx:with_plantuml \
-	"docs/README.md" -o "README.md" -t gfm \
+	-w /data/docs \
+	"README.md" -o "../README.md" -t gfm \
+	-M include-auto \
 	--metadata-file=docs/README.meta.yaml \
 	--from markdown+east_asian_line_breaks \
 	--lua-filter include-files.lua \
