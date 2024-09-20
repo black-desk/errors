@@ -67,7 +67,9 @@ podman run -it --rm \
 	-v "$PWD:/data" \
 	-w /data/docs \
 	docker.io/blackdesk/pandocx:with_plantuml \
-	"README.md" -o "../README.md" -t gfm \
+	"README.md" -o "../README.md" -t gfm-yaml_metadata_block \
+	-s \
+	--table-of-contents \
 	-M include-auto \
 	--metadata-file=README.meta.yaml \
 	--from markdown+east_asian_line_breaks \

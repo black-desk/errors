@@ -1,22 +1,47 @@
 # `errors`: a header-only golang-like error wrapping library for c++11
 
-![](https://img.shields.io/github/check-runs/black-desk/errors/master)
-
 This library aims to bring golang-like error wrapping and handling to
 c++11.
 
+------------------------------------------------------------------------
+
+**Table of contents**
+
+- [Documentation](#documentation)
+  - [Install](#install)
+    - [CMake](#cmake)
+    - [Vendor](#vendor)
+
+------------------------------------------------------------------------
+
+![](https://img.shields.io/github/check-runs/black-desk/errors/master)
+
+# Documentation
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this
+document are to be interpreted as described in RFC 2119.
+
 ## Install
+
+This library is a simple header-only c++11 library, which means that you
+have so many ways to make it available to your project.
 
 ### CMake
 
+You can use this library via the CMake build system.
+
 #### [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake)
+
+It’s **RECOMMEND** to use this library via CPM.cmake, the CMake package
+manager.
 
 1.  Include CPM.cmake to your project
 
 2.  Use CPM.cmake to add this library:
 
     ``` cmake
-    CPMFindPackage("gh:black-desk/errors@0.1.0")
+    CPMFindPackage("gh:black-desk/errors@0.1.0") # or a later release
     ```
 
 3.  Link your target with `errors::errors` like this:
@@ -35,6 +60,9 @@ c++11.
 5.  Start write codes
 
 #### [`FetchContent`](https://cmake.org/cmake/help/latest/module/FetchContent.html)
+
+As CPM.cmake is a wrapper of CMake’s `FetchContent` feature, you can
+also use this library directly via raw `FetchContent`.
 
 1.  Use `FetchContent` to add this library:
 
@@ -65,7 +93,11 @@ c++11.
 
 4.  Start write codes
 
-### Install to system
+#### Install to system
+
+You can also use this library in the old way, which means to install
+this library into your development environment, then use it via CMake’s
+`find_package` function.
 
 1.  Install from source:
 
@@ -77,27 +109,28 @@ c++11.
       && cmake --install build
     ```
 
-2.  Include header file like this:
+2.  Use `find_package` to import this library, then link this library to
+    your target like this:
+
+    ``` cmake
+    find_package( errors 0.1.0 REQUIRED) # or a later release
+
+    add_executable(demo main.cpp)
+    target_link_libraries(demo PRIVATE errors::errors)
+    ```
+
+3.  Include header file like this:
 
     ``` cpp
     #include "errors/error.hpp"
     ```
 
-3.  Start write codes
+4.  Start write codes
 
-After install to system, you can also use `find_package` of CMake, then
-link this library to your target like this:
+### Vendor
 
-``` cmake
-find_package(
-  errors 0.1.0 # or a later release
-  REQUIRED)
-
-add_executable(demo main.cpp)
-target_link_libraries(demo PRIVATE errors::errors)
-```
-
-### Single header mode
+If you want to vendor this library to your project, it’s **RECOMMEND**
+to use the single-file version header.
 
 1.  Download
     [`errors.hpp`](https://github.com/black-desk/errors/releases/latest/download/errors.hpp)
