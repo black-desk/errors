@@ -1,4 +1,4 @@
-# A header only golang-like error wrapping library for c++11
+# `errors`: a header-only golang-like error wrapping library for c++11
 
 ![](https://img.shields.io/github/check-runs/black-desk/errors/master)
 
