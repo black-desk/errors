@@ -101,7 +101,7 @@ pfl_add_library(
   errors-unit-tests
   COMPILE_FEATURES
   INTERFACE
-  cxx_std_17)
+  cxx_std_11)
 
 file(READ ${CMAKE_CURRENT_BINARY_DIR}/include/errors/config.hpp
      ERRORS_CONFIG_HEADER_FILE)
