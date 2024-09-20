@@ -16,3 +16,5 @@ pfl_add_executable(
   COMPILE_OPTIONS
   PRIVATE
   -DERRORS_ENABLE_SOURCE_LOCATION)
+
+add_test(NAME run-examples_use-with-expected COMMAND use-with-expected)

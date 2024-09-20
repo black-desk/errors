@@ -18,3 +18,5 @@ pfl_add_executable(
   ${link_libraries}
   COMPILE_OPTIONS
   ${compile_options})
+
+add_test(NAME run-examples_print-messages COMMAND print-messages)
