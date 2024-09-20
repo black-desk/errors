@@ -1,0 +1,50 @@
+name: Automatic pre-release
+
+on:
+  push:
+    tags: ["v*-*"]
+
+jobs:
+  auto_pre_release:
+    name: Automatic pre-release
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # NOTE:
+          # Some automatic release action
+          # might need history for generate change log.
+          fetch-depth: 0
+
+      - name: Run generate-release-assets.sh
+        id: generate_release_assets
+        run: |
+          # NOTE:
+          # The pitchfork layout holds extra scripts in tools directory.
+          # > https://blog.black-desk.cn/pages/pintchfork-layout.html
+          # But the "Standard Go Project Layout"
+          # holds extra scripts in scripts directory.
+          # > https://github.com/golang-standards/project-layout#scripts
+          generate_release_assets=tools/generate-release-assets.sh
+          if [ ! -f "$generate_release_assets" ]; then
+            generate_release_assets=scripts/generate-release-assets.sh
+          fi
+          if [ ! -f "$generate_release_assets" ]; then
+            echo "generate-release-assets script not found" >&2
+            exit -1
+          fi
+
+          ASSETS="$("${generate_release_assets}")"
+          echo assets="$ASSETS" >> $GITHUB_OUTPUT
+
+      - name: Run marvinpinto/action-automatic-releases
+        uses: marvinpinto/action-automatic-releases@latest
+        if: needs.auto_tag.outputs.new_tag
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ needs.auto_tag.outputs.new_tag }}
+          prerelease: true
+          files: ${{ steps.generate_release_assets.outputs.assets }}
