@@ -10,6 +10,7 @@ c++11.
 - [Documentation](#documentation)
   - [Tutorial](#tutorial)
     - [Basic usage](#basic-usage)
+    - [Use `errors` with `expected`](#use-errors-with-expected)
     - [How to](#how-to)
       - [Customize output format of error
         globally](#customize-output-format-of-error-globally)
@@ -92,6 +93,87 @@ int main()
                   << nlohmann::json(err) << std::endl;
 #endif
 
+        return 0;
+}
+```
+
+### Use `errors` with `expected`
+
+``` cpp
+#include <iostream>
+
+#include "errors/error.hpp"
+#include "tl/expected.hpp"
+
+using errors::common_error;
+using errors::error_ptr;
+using errors::make_error;
+using tl::expected;
+using tl::unexpected;
+
+// NOTE:
+// If you have a `Stack` class that can push and pop integer elements.
+class Stack {
+    public:
+        // NOTE:
+        // You will have some functions that has return value in a semantic way,
+        // like the `pop` function.
+        // It is **RECOMMEND** use `std::expected` (or `tl::expected` for c++11)
+        // to return the expected value when function return correctly
+        // and the error_ptr when something goes wrong.
+        expected<int, error_ptr> pop() noexcept;
+
+        // NOTE:
+        // You can also use `std::expected` (or `tl::expected` for c++11)
+        // for the `push` function which returns nothing.
+        // But its somekind of wired,
+        // because you can just simply return `error_ptr`.
+        error_ptr push(int value) noexcept;
+
+    private:
+        static const int MAX_SIZE = 3;
+        int data[MAX_SIZE];
+        int top = 0;
+};
+
+expected<int, error_ptr> Stack::pop() noexcept
+{
+        if (top == 0) {
+                return unexpected(make_error<common_error>("underflow"));
+        }
+
+        return data[--top];
+}
+
+error_ptr Stack::push(int value) noexcept
+{
+        if (top == MAX_SIZE) {
+                return make_error<common_error>("overflow");
+        }
+
+        data[top++] = value;
+        return nullptr;
+}
+
+int main()
+{
+        Stack stack;
+
+        auto value = stack.pop();
+        assert(!value);
+        std::cerr << "Failed to pop element from stack: " << value.error()
+                  << std::endl;
+
+        auto err = stack.push(1);
+        assert(err == nullptr);
+        err = stack.push(2);
+        assert(err == nullptr);
+        err = stack.push(3);
+        assert(err == nullptr);
+
+        err = stack.push(4);
+        assert(err != nullptr);
+        std::cerr << "Failed to push element to stack: " << err << std::endl;
         return 0;
 }
 ```

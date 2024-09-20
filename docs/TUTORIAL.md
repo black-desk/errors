@@ -4,6 +4,10 @@
 ../examples/basic-usage/README.md
 ```
 
+```include
+../examples/use-with-expected/README.md
+```
+
 ## How to
 
 ```include
