@@ -54,7 +54,8 @@ macro(cpm_add_dependencies)
       VERSION 1.0.0
       GITHUB_REPOSITORY TartanLlama/expected
       GIT_TAG v1.1.0
-      EXCLUDE_FROM_ALL ON)
+      EXCLUDE_FROM_ALL ON
+      OPTIONS "EXPECTED_BUILD_TESTS OFF")
     if(NOT TARGET tl::expected)
       add_library(tl::expected ALIAS tl-expected)
     endif()

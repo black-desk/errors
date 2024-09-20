@@ -178,7 +178,13 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 
 #if defined(ERRORS_ENABLE_NLOHMANN_JSON_SUPPORT)
 #include "nlohmann/json.hpp"
+#if defined(NLOHMANN_JSON_NAMESPACE_BEGIN) && \
+        defined(NLOHMANN_JSON_NAMESPACE_END)
 NLOHMANN_JSON_NAMESPACE_BEGIN
+#else
+namespace nlohmann
+{
+#endif
 template <>
 struct adl_serializer< ::errors::error_ptr> {
         static void to_json(::nlohmann::json &j, const ::errors::error_ptr &err)
@@ -198,5 +204,10 @@ struct adl_serializer< ::errors::error_ptr> {
                 }
         }
 };
+#if defined(NLOHMANN_JSON_NAMESPACE_BEGIN) && \
+        defined(NLOHMANN_JSON_NAMESPACE_END)
 NLOHMANN_JSON_NAMESPACE_END
+#else
+}
+#endif
 #endif

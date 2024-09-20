@@ -1,0 +1,59 @@
+name: Checks
+
+on: [pull_request]
+
+jobs:
+  checks:
+    name: Run black-desk/checks
+    permissions:
+      checks: write
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: black-desk/checks@master
+  build-and-test:
+    name: Build and tests
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        container:
+          - debian:sid-slim
+        cxx: [g++, clang++]
+    container:
+      image: ${{ matrix.container }}
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Cache CPM.cmake Source
+        uses: actions/cache@v4
+        with:
+          path: .cache/cpm/source
+          key: ${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2.0
+      - name: Install system dependencies
+        run: |
+          apt update &&
+          apt install pkg-config make git g++ clang -y
+      - name: Build project with cmake by preset debug
+        run: |
+          mkdir -p .cache/cpm/source &&
+          export CXX="${{ matrix.cxx }}" &&
+          export CPM_SOURCE_CACHE="$PWD/.cache/cpm/source" &&
+          cmake --workflow --preset debug
+  pass:
+    name: Pass
+    if: always()
+    needs:
+      - checks
+      - build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}

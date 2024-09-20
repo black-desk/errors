@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 
 #include "errors/error.hpp"
@@ -105,7 +106,8 @@ std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
         for (; current_err != nullptr;
              current_err = current_err->cause().get()) {
                 os << std::endl
-                   << "[function " << current_err->location().function_name() << " at "
+                   << "[function " << current_err->location().function_name()
+                   << " at "
                    << std::filesystem::path(current_err->location().file_name())
                                 .filename()
                                 .string()

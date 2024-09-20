@@ -99,10 +99,10 @@ struct source_location {
         constexpr source_location(const char *file, const char *function,
                                   uint_least32_t line,
                                   uint_least32_t column) noexcept
-                : file_name_(file),
-                  function_name_(function),
-                  line_number(line),
-                  column_(column)
+                : file_name_(file)
+                , function_name_(function)
+                , line_number(line)
+                , column_(column)
         {
         }
 
@@ -117,8 +117,15 @@ struct source_location {
 
 #if defined(ERRORS_ENABLE_NLOHMANN_JSON_SUPPORT)
 #include "nlohmann/json.hpp"
+#if defined(NLOHMANN_JSON_NAMESPACE_BEGIN) && \
+        defined(NLOHMANN_JSON_NAMESPACE_END)
 NLOHMANN_JSON_NAMESPACE_BEGIN
-template <> struct adl_serializer< ::errors::source_location> {
+#else
+namespace nlohmann
+{
+#endif
+template <>
+struct adl_serializer< ::errors::source_location> {
         static void to_json(::nlohmann::json &j,
                             const ::errors::source_location &loc)
         {
@@ -128,5 +135,10 @@ template <> struct adl_serializer< ::errors::source_location> {
                 j["column"] = loc.column();
         }
 };
+#if defined(NLOHMANN_JSON_NAMESPACE_BEGIN) && \
+        defined(NLOHMANN_JSON_NAMESPACE_END)
 NLOHMANN_JSON_NAMESPACE_END
+#else
+}
+#endif
 #endif
