@@ -8,6 +8,10 @@
 ../examples/use-with-expected/README.md
 ```
 
+```include
+../examples/error-handling/README.md
+```
+
 ## How to
 
 ```include

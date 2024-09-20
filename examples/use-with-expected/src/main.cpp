@@ -11,7 +11,7 @@ using tl::unexpected;
 
 // NOTE:
 // If you have a `Stack` class that can push and pop integer elements.
-class Stack {
+class stack_t {
     public:
         // NOTE:
         // You will have some functions that has return value in a semantic way,
@@ -34,7 +34,7 @@ class Stack {
         int top = 0;
 };
 
-expected<int, error_ptr> Stack::pop() noexcept
+expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
                 return unexpected(make_error<common_error>("underflow"));
@@ -43,7 +43,7 @@ expected<int, error_ptr> Stack::pop() noexcept
         return data[--top];
 }
 
-error_ptr Stack::push(int value) noexcept
+error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
                 return make_error<common_error>("overflow");
@@ -55,7 +55,7 @@ error_ptr Stack::push(int value) noexcept
 
 int main()
 {
-        Stack stack;
+        stack_t stack;
 
         auto value = stack.pop();
         assert(!value);

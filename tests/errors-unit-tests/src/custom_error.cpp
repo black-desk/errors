@@ -6,10 +6,11 @@ namespace
 {
 class fn_error : public ::errors::base_error, public virtual ::errors::error {
     public:
-        class context : public ::errors::context {
+        struct context_t : public ::errors::context {
             public:
-                context(int depth, ::errors::source_location location =
-                                           ::errors::source_location::current())
+                context_t(int depth,
+                          ::errors::source_location location =
+                                  ::errors::source_location::current())
                         : ::errors::context{ location }
                         , depth(depth)
                 {
@@ -17,9 +18,9 @@ class fn_error : public ::errors::base_error, public virtual ::errors::error {
                 int depth;
         };
 
-        fn_error(context context, ::errors::error_ptr &&cause = nullptr)
+        fn_error(context_t context, ::errors::error_ptr &&cause = nullptr)
                 : ::errors::base_error(std::move(cause))
-                , context_(std::move(context))
+                , context(std::move(context))
 
         {
         }
@@ -28,18 +29,18 @@ class fn_error : public ::errors::base_error, public virtual ::errors::error {
         {
                 std::string result;
                 result.append("[depth=");
-                result.append(std::to_string(this->context_.depth));
+                result.append(std::to_string(this->context.depth));
                 result.append("]");
                 return result;
         }
 
         const ::errors::source_location &location() const override
         {
-                return this->context_.location;
+                return this->context.location;
         }
 
     private:
-        context context_;
+        context_t context;
 };
 
 errors::error_ptr fn(unsigned int depth)
@@ -62,7 +63,7 @@ TEST_CASE("custom error works", "[errors][source_location]")
         REQUIRE_THAT(*err->what(), Equals("[depth=3]"));
         REQUIRE_THAT(err->location().function_name(), Equals("fn"));
         REQUIRE_THAT(err->location().file_name(), EndsWith("custom_error.cpp"));
-        REQUIRE(err->location().line() == 50);
+        REQUIRE(err->location().line() == 51);
         REQUIRE(err->is<fn_error>());
 
         REQUIRE(err->cause() != nullptr);
@@ -71,7 +72,7 @@ TEST_CASE("custom error works", "[errors][source_location]")
         REQUIRE_THAT(err->cause()->location().function_name(), Equals("fn"));
         REQUIRE_THAT(err->cause()->location().file_name(),
                      EndsWith("custom_error.cpp"));
-        REQUIRE(err->cause()->location().line() == 50);
+        REQUIRE(err->cause()->location().line() == 51);
         REQUIRE(err->cause()->is<fn_error>());
 
         REQUIRE(err->cause()->cause() != nullptr);
@@ -81,7 +82,7 @@ TEST_CASE("custom error works", "[errors][source_location]")
                      Equals("fn"));
         REQUIRE_THAT(err->cause()->cause()->location().file_name(),
                      EndsWith("custom_error.cpp"));
-        REQUIRE(err->cause()->cause()->location().line() == 50);
+        REQUIRE(err->cause()->cause()->location().line() == 51);
         REQUIRE(err->cause()->cause()->is<fn_error>());
 
         REQUIRE(err->cause()->cause()->cause() != nullptr);
@@ -91,7 +92,7 @@ TEST_CASE("custom error works", "[errors][source_location]")
                      Equals("fn"));
         REQUIRE_THAT(err->cause()->cause()->cause()->location().file_name(),
                      EndsWith("custom_error.cpp"));
-        REQUIRE(err->cause()->cause()->cause()->location().line() == 48);
+        REQUIRE(err->cause()->cause()->cause()->location().line() == 49);
         REQUIRE(err->cause()->cause()->cause()->is<errors::common_error>());
         REQUIRE_THAT(*err->as<errors::common_error>()->what(), Equals("error"));
 
