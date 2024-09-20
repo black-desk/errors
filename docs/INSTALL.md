@@ -79,8 +79,8 @@ then use it via CMake's `find_package` function.
    git clone https://github.com/black-desk/errors && \
      cd errors && \
      cmake -B build && \
-     cmake --build build \
-     && cmake --install build
+     cmake --build build && \
+     cmake --install build
    ```
 
 2. Use `find_package` to import this library,

@@ -95,6 +95,9 @@ pfl_add_library(
   ./src/errors/error.cpp
   ./src/errors/version.cpp
   EXAMPLES
+  basic-usage
+  customize-format-global
+  customize-format-local
   print-messages
   use-with-expected
   TESTS

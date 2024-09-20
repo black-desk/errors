@@ -70,6 +70,7 @@ podman run -it --rm \
 	"README.md" -o "../README.md" -t gfm-yaml_metadata_block \
 	-s \
 	--table-of-contents \
+	--toc-depth=4 \
 	-M include-auto \
 	--metadata-file=README.meta.yaml \
 	--from markdown+east_asian_line_breaks \
