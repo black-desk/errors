@@ -5,10 +5,13 @@
 #include <ostream>
 #include <string>
 
+#if not defined(ERRORS_SINGLE_HEADER_FILE)
 #include "errors/config.hpp"
 #include "errors/version.hpp"
+#endif
 
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION) and \
+        not defined(ERRORS_SINGLE_HEADER_FILE)
 #include "errors/source_location.hpp"
 #endif
 

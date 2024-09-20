@@ -2,7 +2,9 @@
 
 #include <string_view>
 
+#if not defined(ERRORS_SINGLE_HEADER_FILE)
 #include "errors/config.hpp"
+#endif
 
 namespace errors
 {

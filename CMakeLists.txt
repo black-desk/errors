@@ -68,7 +68,7 @@ macro(cpm_add_dependencies)
       GIT_TAG v3.4.0
       VERSION 3.4.0)
     list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
-    message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+    include(Catch)
   endif()
 endmacro()
 
@@ -102,3 +102,13 @@ pfl_add_library(
   COMPILE_FEATURES
   INTERFACE
   cxx_std_17)
+
+file(READ ${CMAKE_CURRENT_BINARY_DIR}/include/errors/config.hpp
+     ERRORS_CONFIG_HEADER_FILE)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/include/errors/version.hpp
+     ERRORS_VERSION_HEADER_FILE)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/include/errors/source_location.hpp
+     ERRORS_SOURCE_LOCATION_HEADER_FILE)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/include/errors/error.hpp
+     ERRORS_ERROR_HEADER_FILE)
+configure_file(./misc/errors.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/errors.hpp)
