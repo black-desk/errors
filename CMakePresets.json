@@ -7,11 +7,12 @@
         },
         "configurePresets": [
                 {
-                        "name": "debug",
-                        "displayName": "Debug configuration",
-                        "description": "Configure errors for development and debugging.",
+                        "name": "default",
+                        "displayName": "Default configuration",
+                        "description": "The default configuration for developers of `errors`",
                         "binaryDir": "${sourceDir}/build",
                         "cacheVariables": {
+                                "CMAKE_CXX_CLANG_TIDY": "$env{CMAKE_CXX_CLANG_TIDY}",
                                 "CPM_DOWNLOAD_ALL": "ON",
                                 "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Og -g -fsanitize=address,undefined",
                                 "CMAKE_EXPORT_COMPILE_COMMANDS": true,
@@ -21,16 +22,18 @@
         ],
         "buildPresets": [
                 {
-                        "name": "debug",
-                        "displayName": "Debug build",
-                        "description": "Build errors for development and debugging.",
-                        "configurePreset": "debug"
+                        "name": "default",
+                        "displayName": "Default build",
+                        "description": "Use default configuration to build `errors` for developers.",
+                        "configurePreset": "default"
                 }
         ],
         "testPresets": [
                 {
-                        "name": "debug",
-                        "configurePreset": "debug",
+                        "name": "default",
+                        "displayName": "Default tests",
+                        "description": "Use default configuration to test `errors` for developers.",
+                        "configurePreset": "default",
                         "output": {
                                 "outputOnFailure": true
                         },
@@ -42,21 +45,21 @@
         ],
         "workflowPresets": [
                 {
-                        "name": "debug",
-                        "displayName": "Workflow for developers",
-                        "description": "Configure, build then test for developing and debuging ocppi.",
+                        "name": "default",
+                        "displayName": "Default workflow for developers",
+                        "description": "Configure, build then test `errors` for developers.",
                         "steps": [
                                 {
                                         "type": "configure",
-                                        "name": "debug"
+                                        "name": "default"
                                 },
                                 {
                                         "type": "build",
-                                        "name": "debug"
+                                        "name": "default"
                                 },
                                 {
                                         "type": "test",
-                                        "name": "debug"
+                                        "name": "default"
                                 }
                         ]
                 }
