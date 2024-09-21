@@ -1,4 +1,0 @@
-include-before: |
-  ```include
-  ./HEADER.md
-  ```

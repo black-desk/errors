@@ -1,38 +1,30 @@
 # `errors`: a header-only golang-like error wrapping library for c++11
 
-This library aims to bring golang-like error wrapping and handling to
-c++11.
-
-------------------------------------------------------------------------
-
-**Table of contents**
-
-- [Documentation](#documentation)
-  - [Tutorial](#tutorial)
-    - [Basic usage](#basic-usage)
-    - [Use `errors` with `expected`](#use-errors-with-expected)
-    - [Handle error with code](#handle-error-with-code)
-    - [How to](#how-to)
-      - [Customize output format of error
-        globally](#customize-output-format-of-error-globally)
-      - [Customize output format of error
-        locally](#customize-output-format-of-error-locally)
-  - [Install](#install)
-    - [CMake](#cmake)
-      - [CPM.cmake](#cpm.cmake)
-      - [`FetchContent`](#fetchcontent)
-      - [Install to system](#install-to-system)
-    - [Vendor](#vendor)
-
-------------------------------------------------------------------------
+This library aims to bring golang-like error wrapping and handling to c++11.
 
 ![](https://img.shields.io/github/check-runs/black-desk/errors/master)
 
-# Documentation
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
 
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
-“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this
-document are to be interpreted as described in RFC 2119.
+## Table of Contents
+
+- [Tutorial](#tutorial)
+  - [Basic usage](#basic-usage)
+  - [Use `errors` with `expected`](#use-errors-with-expected)
+  - [Handle error with code](#handle-error-with-code)
+  - [How to](#how-to)
+    - [Customize output format of error
+      globally](#customize-output-format-of-error-globally)
+    - [Customize output format of error
+      locally](#customize-output-format-of-error-locally)
+- [Install](#install)
+  - [CMake](#cmake)
+    - [CPM.cmake](#cpm.cmake)
+    - [`FetchContent`](#fetchcontent)
+    - [Install to system](#install-to-system)
+  - [Vendor](#vendor)
 
 ## Tutorial
 

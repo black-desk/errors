@@ -66,13 +66,15 @@ cd ..
 podman run -it --rm \
 	-v "$PWD:/data" \
 	-w /data/docs \
-	docker.io/blackdesk/pandocx:with_plantuml \
+	docker.io/blackdesk/pandocx:latest \
+	--template ./README.template.md \
 	"README.md" -o "../README.md" -t gfm-yaml_metadata_block \
 	-s \
+	-V toc-title:"Table of Contents" \
+	--shift-heading-level-by=1 \
 	--table-of-contents \
 	--toc-depth=4 \
 	-M include-auto \
-	--metadata-file=README.meta.yaml \
 	--from markdown+east_asian_line_breaks \
 	--lua-filter include-files.lua \
 	--lua-filter include-code-files.lua
