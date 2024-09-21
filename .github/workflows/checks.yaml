@@ -44,7 +44,7 @@ jobs:
           mkdir -p .cache/cpm/source &&
           export CXX="${{ matrix.cxx }}" &&
           export CPM_SOURCE_CACHE="$PWD/.cache/cpm/source" &&
-          cmake --workflow --preset debug
+          cmake --workflow --preset default
   pass:
     name: Pass
     if: always()
