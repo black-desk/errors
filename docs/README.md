@@ -5,3 +5,7 @@
 ```include
 ./INSTALL.md
 ```
+
+```include
+./CONTRIBUTING.md
+```

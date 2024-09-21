@@ -25,6 +25,9 @@ interpreted as described in RFC 2119.
     - [`FetchContent`](#fetchcontent)
     - [Install to system](#install-to-system)
   - [Vendor](#vendor)
+- [Contributing to `errors`](#contributing-to-errors)
+  - [Coding Rules](#coding-rules)
+  - [Build](#build)
 
 ## Tutorial
 
@@ -573,3 +576,112 @@ to use the single-file version header.
     ```
 
 4.  Start write codes
+
+## Contributing to `errors`
+
+### Coding Rules
+
+Check coding ruels [here](https://github.com/black-desk/coding-rules)
+
+### Build
+
+**NOTE**: This is the build guide for developers want to build and test
+this project.
+
+It is **RECOMMEND** to build and test this project using
+[cmake-presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html)
+with the `default` preset.
+
+``` bash
+cmake --workflow --preset=default
+```
+
+You can use environment variables to customize CMake workflow like this:
+
+``` bash
+# Use [ccache](https://ccache.dev/)
+export CMAKE_CXX_LAUNCHER=ccache
+# Use clang++
+export CXX=clang++
+
+# Run clang-tidy
+# NOTE:
+# This is not the standard CMake environment variable,
+# this project support this variable by using this env to initialize
+# the CMake cache variable of the same name in preset.
+export CMAKE_CXX_CLANG_TIDY=clang-tidy
+
+cmake --workflow --preset=default --fresh
+```
+
+The configuration of `default` preset is:
+
+``` json
+{
+        "version": 6,
+        "cmakeMinimumRequired": {
+                "major": 3,
+                "minor": 25,
+                "patch": 0
+        },
+        "configurePresets": [
+                {
+                        "name": "default",
+                        "displayName": "Default configuration",
+                        "description": "The default configuration for developers of `errors`",
+                        "binaryDir": "${sourceDir}/build",
+                        "cacheVariables": {
+                                "CMAKE_CXX_CLANG_TIDY": "$env{CMAKE_CXX_CLANG_TIDY}",
+                                "CPM_DOWNLOAD_ALL": "ON",
+                                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Og -g -fsanitize=address,undefined",
+                                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+                                "CMAKE_COLOR_DIAGNOSTICS": true
+                        }
+                }
+        ],
+        "buildPresets": [
+                {
+                        "name": "default",
+                        "displayName": "Default build",
+                        "description": "Use default configuration to build `errors` for developers.",
+                        "configurePreset": "default"
+                }
+        ],
+        "testPresets": [
+                {
+                        "name": "default",
+                        "displayName": "Default tests",
+                        "description": "Use default configuration to test `errors` for developers.",
+                        "configurePreset": "default",
+                        "output": {
+                                "outputOnFailure": true
+                        },
+                        "execution": {
+                                "noTestsAction": "error",
+                                "stopOnFailure": true
+                        }
+                }
+        ],
+        "workflowPresets": [
+                {
+                        "name": "default",
+                        "displayName": "Default workflow for developers",
+                        "description": "Configure, build then test `errors` for developers.",
+                        "steps": [
+                                {
+                                        "type": "configure",
+                                        "name": "default"
+                                },
+                                {
+                                        "type": "build",
+                                        "name": "default"
+                                },
+                                {
+                                        "type": "test",
+                                        "name": "default"
+                                }
+                        ]
+                }
+        ]
+}
+```
