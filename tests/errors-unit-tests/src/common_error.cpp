@@ -2,20 +2,26 @@
 #include "errors/error.hpp"
 #include "nlohmann/json.hpp"
 
+using errors::common_error;
+using errors::error_ptr;
+using errors::make_error;
+using errors::wrap;
+
 namespace
 {
-errors::error_ptr fn1()
+
+error_ptr fn1()
 {
-        return errors::make_error<errors::common_error>("error");
+        return make_error("error");
 }
 
-errors::error_ptr fn2(unsigned int depth)
+error_ptr fn2(unsigned int depth)
 {
         if (depth == 0) {
-                return errors::make_error<errors::common_error>("error");
+                return make_error("error");
         }
-        return errors::make_error<errors::common_error>(
-                "depth=" + std::to_string(depth), fn2(depth - 1));
+        auto err = fn2(depth - 1);
+        return wrap(std::move(err), "depth=" + std::to_string(depth));
 }
 }
 

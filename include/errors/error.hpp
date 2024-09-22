@@ -18,16 +18,6 @@
 namespace errors
 {
 
-struct context {
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-        context(source_location location = source_location::current())
-                : location{ location }
-        {
-        }
-        source_location location;
-#endif
-};
-
 class error {
     public:
         error() = default;
@@ -73,8 +63,15 @@ using error_ptr = std::unique_ptr<error>;
 
 class base_error : public virtual error {
     public:
-        base_error(error_ptr &&cause = nullptr)
+        base_error(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                source_location location,
+#endif
+                error_ptr &&cause)
                 : cause_(std::move(cause))
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                , location_(std::move(location))
+#endif
         {
         }
         const std::unique_ptr<error> &cause() const override
@@ -82,77 +79,128 @@ class base_error : public virtual error {
                 return this->cause_;
         }
 
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+        const source_location &location() const override
+        {
+                return this->location_;
+        }
+#endif
+
     private:
         error_ptr cause_;
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+        source_location location_;
+#endif
 };
 
 class common_error : public base_error, public virtual error {
     public:
-        struct context_t : public errors::context {
+        common_error(
 #if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                context_t(char const *message,
-                          source_location location = source_location::current())
-                        : errors::context{ location }
-                {
-                        if (message != nullptr) {
-                                this->message = message;
-                        }
-                }
-                context_t(std::string message,
-                          source_location location = source_location::current())
-                        : errors::context{ location }
-                        , message{ std::move(message) }
-                {
-                }
-#else
-                context_t(char const *message)
-                        : errors::context{}
-                {
-                        if (message != nullptr) {
-                                this->message = message;
-                        }
-                }
-                context_t(std::string message)
-                        : errors::context{}
-                        , message{ std::move(message) }
-                {
-                }
+                source_location location,
 #endif
-                std::optional<std::string> message;
-        };
+                error_ptr &&cause, const char *message)
+                : base_error(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                          std::move(location),
+#endif
+                          std::move(cause))
 
-        common_error(context_t context, error_ptr &&cause = nullptr)
-                : base_error(std::move(cause))
-                , context(std::move(context))
+        {
+                if (!message) {
+                        return;
+                }
+                this->message_ = message;
+        }
+
+        common_error(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                source_location location,
+#endif
+                error_ptr &&cause, std::string message)
+                : base_error(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                          std::move(location),
+#endif
+                          std::move(cause))
+                , message_(std::move(message))
         {
         }
 
         std::optional<std::string> what() const override
         {
-                return this->context.message;
+                return this->message_;
         }
-
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-        const source_location &location() const override
-        {
-                return this->context.location;
-        }
-#endif
 
     private:
-        context_t context;
+        std::optional<std::string> message_;
+};
+
+// NOTE:
+// This is a helper struct to automatically capture the source_location
+// for the caller of make_error with implicit conversion
+// from T or nullptr_t to capture_location<error_ptr>.
+// This trick inspired by
+// answers from https://stackoverflow.com/a/57548488
+// and https://stackoverflow.com/a/66402319.
+// See https://stackoverflow.com/questions/57547273/how-to-use-source-location-in-a-variadic-template-function
+template <typename T>
+struct capture_location {
+        T value;
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+        source_location location;
+        capture_location(std::nullptr_t value,
+                         source_location location = source_location::current())
+                : value(std::move(value))
+                , location(std::move(location))
+        {
+        }
+        capture_location(T value,
+                         source_location location = source_location::current())
+                : value(std::move(value))
+                , location(std::move(location))
+        {
+        }
+#else
+        capture_location(std::nullptr_t value)
+                : value(value)
+        {
+        }
+        capture_location(T &&value)
+                : value(std::move(value))
+        {
+        }
+#endif
 };
 
 template <typename E, typename... Args>
-inline error_ptr make_error(typename E::context_t ctx, Args &&...args)
+inline error_ptr make_error(capture_location<error_ptr> &&cause, Args &&...args)
 {
-        return std::make_unique<E>(std::move(ctx), std::forward<Args>(args)...);
+        return std::make_unique<E>(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                std::move(cause.location),
+#endif
+                std::move(cause.value), std::forward<Args>(args)...);
 }
 
-inline error_ptr wrap(errors::error_ptr &&cause,
-                      common_error::context_t ctx = { nullptr })
+inline error_ptr make_error(capture_location<const char *> message)
 {
-        return make_error<common_error>(std::move(ctx), std::move(cause));
+        return std::make_unique<common_error>(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                std::move(message.location),
+#endif
+                nullptr, message.value);
+}
+
+inline error_ptr wrap(capture_location<error_ptr> &&cause,
+                      const char *message = nullptr)
+{
+        return make_error<common_error>(std::move(cause), message);
+}
+
+inline error_ptr wrap(capture_location<error_ptr> &&cause, std::string message)
+{
+        return make_error<common_error>(std::move(cause), std::move(message));
 }
 
 } // namespace errors

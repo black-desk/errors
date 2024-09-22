@@ -14,7 +14,7 @@ using errors::wrap;
 // you can return an error_ptr.
 error_ptr fn() noexcept
 {
-        return make_error<common_error>("error occurs");
+        return make_error("error occurs");
 };
 
 // NOTE:

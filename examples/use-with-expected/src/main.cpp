@@ -37,7 +37,7 @@ class stack_t {
 expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
-                return unexpected(make_error<common_error>("underflow"));
+                return unexpected(make_error("underflow"));
         }
 
         return data[--top];
@@ -46,7 +46,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
-                return make_error<common_error>("overflow");
+                return make_error("overflow");
         }
 
         data[top++] = value;

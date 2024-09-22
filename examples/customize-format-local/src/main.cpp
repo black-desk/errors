@@ -38,7 +38,7 @@ std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 void print_error_in_local_ns()
 {
         // Using the custom operator<<
-        std::cerr << wrap(wrap(make_error<common_error>("error"))) << std::endl;
+        std::cerr << wrap(wrap(make_error("error"))) << std::endl;
 }
 }
 
@@ -49,7 +49,7 @@ void print_error_in_global_ns()
         using errors::wrap;
 
         // Using the default operator<<
-        std::cerr << wrap(wrap(make_error<common_error>("error"))) << std::endl;
+        std::cerr << wrap(wrap(make_error("error"))) << std::endl;
 }
 
 int main()
