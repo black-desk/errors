@@ -1,12 +1,13 @@
 # `errors`: a header-only golang-like error wrapping library for c++11
 
-This library aims to bring golang-like error wrapping and handling to c++11.
-
 ![](https://img.shields.io/github/check-runs/black-desk/errors/master)
+![](https://img.shields.io/github/commit-activity/w/black-desk/errors/master)
+![](https://img.shields.io/github/contributors/black-desk/errors)
+![](https://img.shields.io/github/release-date/black-desk/errors)
+![](https://img.shields.io/github/commits-since/black-desk/errors/latest/master)
+![](https://img.shields.io/github/license/black-desk/errors)
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in RFC 2119.
+This library aims to bring golang-like error wrapping and handling to c++11.
 
 ## Table of Contents
 
@@ -28,6 +29,10 @@ interpreted as described in RFC 2119.
 - [Contributing to `errors`](#contributing-to-errors)
   - [Coding Rules](#coding-rules)
   - [Build](#build)
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
 
 ## Tutorial
 
@@ -493,7 +498,7 @@ manager.
 2.  Use CPM.cmake to add this library:
 
     ``` cmake
-    CPMFindPackage("gh:black-desk/errors@0.1.0") # or a later release
+    CPMFindPackage("gh:black-desk/errors@0.2.0") # or a later release
     ```
 
 3.  Link your target with `errors::errors` like this:
@@ -524,7 +529,7 @@ also use this library directly via raw `FetchContent`.
     FetchContent_Declare(
       errors
       GIT_REPOSITORY https://github.com/black-desk/errors.git
-      GIT_TAG        v0.1.0 # or a later release
+      GIT_TAG        v0.2.0 # or a later release
     )
 
     FetchContent_MakeAvailable(errors)
@@ -565,7 +570,7 @@ this library into your development environment, then use it via CMake’s
     your target like this:
 
     ``` cmake
-    find_package( errors 0.1.0 REQUIRED) # or a later release
+    find_package( errors 0.2.0 REQUIRED) # or a later release
 
     add_executable(demo main.cpp)
     target_link_libraries(demo PRIVATE errors::errors)

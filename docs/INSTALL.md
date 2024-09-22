@@ -15,7 +15,7 @@ It's **RECOMMEND** to use this library via CPM.cmake, the CMake package manager.
 2. Use CPM.cmake to add this library:
 
    ```cmake
-   CPMFindPackage("gh:black-desk/errors@0.1.0") # or a later release
+   CPMFindPackage("gh:black-desk/errors@0.2.0") # or a later release
    ```
 
 3. Link your target with `errors::errors` like this:
@@ -46,7 +46,7 @@ you can also use this library directly via raw `FetchContent`.
    FetchContent_Declare(
      errors
      GIT_REPOSITORY https://github.com/black-desk/errors.git
-     GIT_TAG        v0.1.0 # or a later release
+     GIT_TAG        v0.2.0 # or a later release
    )
 
    FetchContent_MakeAvailable(errors)
@@ -87,7 +87,7 @@ then use it via CMake's `find_package` function.
    then link this library to your target like this:
 
    ```cmake
-   find_package( errors 0.1.0 REQUIRED) # or a later release
+   find_package( errors 0.2.0 REQUIRED) # or a later release
 
    add_executable(demo main.cpp)
    target_link_libraries(demo PRIVATE errors::errors)
