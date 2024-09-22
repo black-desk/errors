@@ -37,7 +37,7 @@ int main()
         using errors::make_error;
         using errors::wrap;
 
-        std::cerr << wrap(wrap(make_error<common_error>("error"))) << std::endl;
+        std::cerr << wrap(wrap(make_error("error"))) << std::endl;
 
         return 0;
 }

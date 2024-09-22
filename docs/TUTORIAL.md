@@ -9,7 +9,7 @@
 ```
 
 ```include
-../examples/error-handling/README.md
+../examples/advanced-usage/README.md
 ```
 
 ## How to

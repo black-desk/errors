@@ -95,10 +95,10 @@ pfl_add_library(
   ./src/errors/error.cpp
   ./src/errors/version.cpp
   EXAMPLES
+  advanced-usage
   basic-usage
   customize-format-global
   customize-format-local
-  error-handling
   use-with-expected
   TESTS
   errors-unit-tests

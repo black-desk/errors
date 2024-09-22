@@ -13,7 +13,7 @@ interpreted as described in RFC 2119.
 - [Tutorial](#tutorial)
   - [Basic usage](#basic-usage)
   - [Use `errors` with `expected`](#use-errors-with-expected)
-  - [Handle error with code](#handle-error-with-code)
+  - [Advanced usage](#advanced-usage)
   - [How to](#how-to)
     - [Customize output format of error
       globally](#customize-output-format-of-error-globally)
@@ -50,7 +50,7 @@ using errors::wrap;
 // you can return an error_ptr.
 error_ptr fn() noexcept
 {
-        return make_error<common_error>("error occurs");
+        return make_error("error occurs");
 };
 
 // NOTE:
@@ -135,7 +135,7 @@ class stack_t {
 expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
-                return unexpected(make_error<common_error>("underflow"));
+                return unexpected(make_error("underflow"));
         }
 
         return data[--top];
@@ -144,7 +144,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
-                return make_error<common_error>("overflow");
+                return make_error("overflow");
         }
 
         data[top++] = value;
@@ -174,7 +174,7 @@ int main()
 }
 ```
 
-### Handle error with code
+### Advanced usage
 
 ``` cpp
 #include <iostream>
@@ -185,6 +185,7 @@ int main()
 using errors::common_error;
 using errors::error_ptr;
 using errors::make_error;
+using errors::wrap;
 using tl::expected;
 using tl::unexpected;
 
@@ -202,32 +203,28 @@ class stack_t {
 
 // NOTE:
 // A new error type for errors reported by stack_t class.
-class stack_error_t : public errors::base_error {
+// An error type should records
+// the machine friendly error context information.
+// It can be used to generate developer and
+// user friendly error message later.
+struct stack_error_t : public errors::base_error {
     public:
         // NOTE:
-        // An error context class records
-        // the machine friendly error context information.
-        // It can be used to generate developer and
-        // user friendly error message later.
-        struct context_t : public errors::context {
-                context_t(int top, errors::source_location location =
-                                           errors::source_location::current())
-                        : ::errors::context(location)
-                        , top(top)
-                {
-                }
-                int top;
-        };
-
-        stack_error_t(context_t context, error_ptr &&cause = nullptr)
-                : base_error(std::move(cause))
-                , context(std::move(context))
+        // Write a constructor whichs first two arguments are
+        // `source_location` and `error_ptr`
+        // to make this error type compatible with errors::make_error.
+        stack_error_t(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                errors::source_location location,
+#endif
+                error_ptr &&cause, int top)
+                : base_error(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                          std::move(location),
+#endif
+                          std::move(cause))
+                , top(top)
         {
-        }
-
-        const errors::source_location &location() const override
-        {
-                return this->context.location;
         }
 
         // NOTE:
@@ -238,18 +235,18 @@ class stack_error_t : public errors::base_error {
         {
                 std::string result;
                 result.append("stack error [top=");
-                result.append(std::to_string(context.top));
+                result.append(std::to_string(top));
                 result.append("]");
                 return result;
         }
 
-        context_t context;
+        int top;
 };
 
 expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
-                return unexpected(make_error<stack_error_t>(top));
+                return unexpected(make_error<stack_error_t>(nullptr, top));
         }
 
         return data[--top];
@@ -258,7 +255,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
-                return make_error<stack_error_t>(top);
+                return make_error<stack_error_t>(nullptr, top);
         }
 
         data[top++] = value;
@@ -283,12 +280,12 @@ void print_stack_error(const error_ptr &err)
         auto stack_error = err->as<stack_error_t>();
         assert(stack_error != nullptr);
 
-        if (stack_error->context.top == 0) {
+        if (stack_error->top == 0) {
                 std::cout << "Stack underflow" << std::endl;
                 return;
         }
 
-        if (stack_error->context.top == stack_t::MAX_SIZE) {
+        if (stack_error->top == stack_t::MAX_SIZE) {
                 std::cout << "Stack overflow" << std::endl;
                 return;
         }
@@ -300,10 +297,11 @@ error_ptr fn(stack_t &stack)
 {
         auto value = stack.pop();
         assert(!value);
-        return errors::wrap(
-                errors::wrap(errors::wrap(std::move(value).error())),
-                "something goes wrong");
+        return wrap(wrap(wrap(std::move(value).error())),
+                    "something goes wrong");
 }
+
+void make_stack_error_omit_cause();
 
 int main()
 {
@@ -329,10 +327,34 @@ int main()
         assert(err != nullptr);
         print_stack_error(err);
 
-        err = make_error<stack_error_t>(1);
+        err = make_error<stack_error_t>(nullptr, 1);
         print_stack_error(err);
 
+        make_stack_error_omit_cause();
+
         return 0;
+}
+
+// NOTE:
+// Maybe you are tired to write make_error<stack_error_t>(nullptr,...)
+// as your error never caused by low-lever errors.
+// This is a trick to define your own `make_error` function for stack_error_t
+// which does not required the `cause` argument.
+
+template <typename T>
+error_ptr make_error(errors::capture_location<int> top) = delete;
+
+template <>
+error_ptr make_error<stack_error_t>(errors::capture_location<int> top)
+{
+        return std::make_unique<stack_error_t>(top.location, nullptr,
+                                               top.value);
+}
+
+void make_stack_error_omit_cause()
+{
+        auto err = make_error<stack_error_t>(1);
+        print_stack_error(err);
 }
 ```
 
@@ -380,7 +402,7 @@ int main()
         using errors::make_error;
         using errors::wrap;
 
-        std::cerr << wrap(wrap(make_error<common_error>("error"))) << std::endl;
+        std::cerr << wrap(wrap(make_error("error"))) << std::endl;
 
         return 0;
 }
@@ -429,7 +451,7 @@ std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 void print_error_in_local_ns()
 {
         // Using the custom operator<<
-        std::cerr << wrap(wrap(make_error<common_error>("error"))) << std::endl;
+        std::cerr << wrap(wrap(make_error("error"))) << std::endl;
 }
 }
 
@@ -440,7 +462,7 @@ void print_error_in_global_ns()
         using errors::wrap;
 
         // Using the default operator<<
-        std::cerr << wrap(wrap(make_error<common_error>("error"))) << std::endl;
+        std::cerr << wrap(wrap(make_error("error"))) << std::endl;
 }
 
 int main()
