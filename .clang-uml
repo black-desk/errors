@@ -1,0 +1,14 @@
+# vim: ft=yaml
+compilation_database_dir: build
+output_directory: docs/diagrams
+diagrams:
+  errors:
+    type: class
+    glob:
+      - ./src/errors/error.cpp
+    include:
+      namespaces:
+        - errors
+    exclude:
+      namespaces:
+        - errors::details
