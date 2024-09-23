@@ -3,7 +3,6 @@
 #include "errors/error.hpp"
 #include "tl/expected.hpp"
 
-using errors::common_error;
 using errors::error_ptr;
 using errors::make_error;
 using errors::wrap;
@@ -28,7 +27,7 @@ class stack_t {
 // the machine friendly error context information.
 // It can be used to generate developer and
 // user friendly error message later.
-struct stack_error_t : public errors::base_error {
+struct stack_error_t : public errors::message_error {
     public:
         // NOTE:
         // Write a constructor whichs first two arguments are
@@ -39,26 +38,14 @@ struct stack_error_t : public errors::base_error {
                 errors::source_location location,
 #endif
                 error_ptr &&cause, int top)
-                : base_error(
+                : message_error(
 #if defined(ERRORS_ENABLE_SOURCE_LOCATION)
                           std::move(location),
 #endif
-                          std::move(cause))
+                          std::move(cause),
+                          "stack error [top=" + std::to_string(top) + "]")
                 , top(top)
         {
-        }
-
-        // NOTE:
-        // This method is used to generate error messages
-        // meant to be printed in logs,
-        // which should be developer friendly.
-        std::optional<std::string> what() const override
-        {
-                std::string result;
-                result.append("stack error [top=");
-                result.append(std::to_string(top));
-                result.append("]");
-                return result;
         }
 
         int top;

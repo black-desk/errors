@@ -3,7 +3,6 @@
 
 #include "errors/error.hpp"
 
-using errors::common_error;
 using errors::error_ptr;
 using errors::make_error;
 using errors::wrap;
@@ -41,10 +40,11 @@ int main()
         // But the wrapped error does record the wrap() source_location to err.
         // You can get it by calling err->location()
         auto loc = err->location();
-        std::cerr << "Error function: " << loc.function_name() << std::endl
-                  << "Error file_name: " << loc.file_name() << std::endl
-                  << "Error line: " << loc.line() << std::endl
-                  << "Error column: " << loc.column() << std::endl;
+        assert(loc.has_value());
+        std::cerr << "Error function: " << loc->function_name() << std::endl
+                  << "Error file_name: " << loc->file_name() << std::endl
+                  << "Error line: " << loc->line() << std::endl
+                  << "Error column: " << loc->column() << std::endl;
 
         // NOTE:
         // Or use json output.
