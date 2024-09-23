@@ -3,7 +3,6 @@
 #include "errors/error.hpp"
 #include "tl/expected.hpp"
 
-using errors::common_error;
 using errors::error_ptr;
 using errors::make_error;
 using tl::expected;

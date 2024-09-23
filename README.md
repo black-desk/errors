@@ -72,7 +72,6 @@ A function or method want to return an error should return an
 
 #include "errors/error.hpp"
 
-using errors::common_error;
 using errors::error_ptr;
 using errors::make_error;
 using errors::wrap;
@@ -110,10 +109,11 @@ int main()
         // But the wrapped error does record the wrap() source_location to err.
         // You can get it by calling err->location()
         auto loc = err->location();
-        std::cerr << "Error function: " << loc.function_name() << std::endl
-                  << "Error file_name: " << loc.file_name() << std::endl
-                  << "Error line: " << loc.line() << std::endl
-                  << "Error column: " << loc.column() << std::endl;
+        assert(loc.has_value());
+        std::cerr << "Error function: " << loc->function_name() << std::endl
+                  << "Error file_name: " << loc->file_name() << std::endl
+                  << "Error line: " << loc->line() << std::endl
+                  << "Error column: " << loc->column() << std::endl;
 
         // NOTE:
         // Or use json output.
@@ -134,7 +134,6 @@ int main()
 #include "errors/error.hpp"
 #include "tl/expected.hpp"
 
-using errors::common_error;
 using errors::error_ptr;
 using errors::make_error;
 using tl::expected;
@@ -215,7 +214,6 @@ int main()
 #include "errors/error.hpp"
 #include "tl/expected.hpp"
 
-using errors::common_error;
 using errors::error_ptr;
 using errors::make_error;
 using errors::wrap;
@@ -240,7 +238,7 @@ class stack_t {
 // the machine friendly error context information.
 // It can be used to generate developer and
 // user friendly error message later.
-struct stack_error_t : public errors::base_error {
+struct stack_error_t : public errors::message_error {
     public:
         // NOTE:
         // Write a constructor whichs first two arguments are
@@ -251,26 +249,14 @@ struct stack_error_t : public errors::base_error {
                 errors::source_location location,
 #endif
                 error_ptr &&cause, int top)
-                : base_error(
+                : message_error(
 #if defined(ERRORS_ENABLE_SOURCE_LOCATION)
                           std::move(location),
 #endif
-                          std::move(cause))
+                          std::move(cause),
+                          "stack error [top=" + std::to_string(top) + "]")
                 , top(top)
         {
-        }
-
-        // NOTE:
-        // This method is used to generate error messages
-        // meant to be printed in logs,
-        // which should be developer friendly.
-        std::optional<std::string> what() const override
-        {
-                std::string result;
-                result.append("stack error [top=");
-                result.append(std::to_string(top));
-                result.append("]");
-                return result;
         }
 
         int top;
@@ -406,36 +392,53 @@ void make_stack_error_omit_cause()
 #define ERRORS_DISABLE_OSTREAM
 #include "errors/error.hpp"
 
-std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
+inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 {
-        auto current_err = err.get();
-        if (!current_err) {
-                os << "success";
+        auto current = err.get();
+
+        if (!current) {
+                os << "no error";
                 return os;
         }
 
-        for (; current_err != nullptr;
-             current_err = current_err->cause().get()) {
-                os << std::endl
-                   << "[function " << current_err->location().function_name()
-                   << " at "
-                   << std::filesystem::path(current_err->location().file_name())
-                                .filename()
-                                .string()
-                   << " " << current_err->location().line() << ":"
-                   << current_err->location().column() << "] "
-                   << current_err->what().value_or("");
+        while (current != nullptr) {
+                os << std::endl;
+
+                auto location = current->location();
+                if (!location) {
+                        os << "[source location not available] ";
+                } else {
+                        os << "[function " << location->function_name()
+                           << " at "
+                           << std::filesystem::path(location->file_name())
+                                        .filename()
+                                        .string()
+                           << " " << location->line() << ":"
+                           << location->column() << "] ";
+                }
+
+                auto what = current->what();
+                assert(what);
+                os << what;
+
+                auto current_with_cause =
+                        dynamic_cast<const errors::with_cause *>(current);
+                if (!current_with_cause) {
+                        break;
+                }
+
+                current = current_with_cause->cause().get();
         }
+
         return os;
 }
 
 int main()
 {
-        using errors::common_error;
         using errors::make_error;
         using errors::wrap;
 
-        std::cerr << wrap(wrap(make_error("error"))) << std::endl;
+        std::cerr << "Error: " << wrap(wrap(make_error("error"))) << std::endl;
 
         return 0;
 }
@@ -449,7 +452,6 @@ int main()
 
 #include "errors/error.hpp"
 
-using errors::common_error;
 using errors::make_error;
 using errors::wrap;
 
@@ -459,43 +461,61 @@ namespace local_ns
 // This is a custom operator for printing the error in a more verbose format.
 // But it is not going to
 // override the default operator<< outside of this namespace.
-std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
+inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 {
-        auto current_err = err.get();
-        if (!current_err) {
-                os << "success";
+        auto current = err.get();
+
+        if (!current) {
+                os << "no error";
                 return os;
         }
 
-        for (; current_err != nullptr;
-             current_err = current_err->cause().get()) {
-                os << std::endl
-                   << "[function " << current_err->location().function_name()
-                   << " at "
-                   << std::filesystem::path(current_err->location().file_name())
-                                .filename()
-                                .string()
-                   << " " << current_err->location().line() << ":"
-                   << current_err->location().column() << "] "
-                   << current_err->what().value_or("");
+        while (current != nullptr) {
+                os << std::endl;
+
+                auto location = current->location();
+                if (!location) {
+                        os << "[source location not available] ";
+                } else {
+                        os << "[function " << location->function_name()
+                           << " at "
+                           << std::filesystem::path(location->file_name())
+                                        .filename()
+                                        .string()
+                           << " " << location->line() << ":"
+                           << location->column() << "] ";
+                }
+
+                auto what = current->what();
+                assert(what);
+                os << what;
+
+                auto current_with_cause =
+                        dynamic_cast<const errors::with_cause *>(current);
+                if (!current_with_cause) {
+                        break;
+                }
+
+                current = current_with_cause->cause().get();
         }
+
         return os;
 }
+
 void print_error_in_local_ns()
 {
         // Using the custom operator<<
-        std::cerr << wrap(wrap(make_error("error"))) << std::endl;
+        std::cerr << "Error: " << wrap(wrap(make_error("error"))) << std::endl;
 }
 }
 
 void print_error_in_global_ns()
 {
-        using errors::common_error;
         using errors::make_error;
         using errors::wrap;
 
         // Using the default operator<<
-        std::cerr << wrap(wrap(make_error("error"))) << std::endl;
+        std::cerr << "Error: " << wrap(wrap(make_error("error"))) << std::endl;
 }
 
 int main()
