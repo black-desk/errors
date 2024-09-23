@@ -7,7 +7,14 @@
 ![](https://img.shields.io/github/commits-since/black-desk/errors/latest/master)
 ![](https://img.shields.io/github/license/black-desk/errors)
 
-This library aims to bring golang-like error wrapping and handling to c++11.
+This library aims to bring golang-like error wrapping and handling to
+c++11.
+
+---------------------------------------------------------------------
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in RFC 2119.
 
 ## Table of Contents
 
@@ -30,10 +37,6 @@ This library aims to bring golang-like error wrapping and handling to c++11.
 - [Contributing to `errors`](#contributing-to-errors)
   - [Coding Rules](#coding-rules)
   - [Build](#build)
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in RFC 2119.
 
 ## Overview
 
