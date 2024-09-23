@@ -11,6 +11,7 @@ This library aims to bring golang-like error wrapping and handling to c++11.
 
 ## Table of Contents
 
+- [Overview](#overview)
 - [Tutorial](#tutorial)
   - [Basic usage](#basic-usage)
   - [Use `errors` with `expected`](#use-errors-with-expected)
@@ -33,6 +34,22 @@ This library aims to bring golang-like error wrapping and handling to c++11.
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
 interpreted as described in RFC 2119.
+
+## Overview
+
+When you are writing C++ code in a project where exceptions are not
+allowed, error reporting often becomes a problem. In the traditional
+model, in such cases, developers almost only have error codes as the
+error handling mechanism. However, handling errors based on error codes
+is relatively primitive and not very user-friendly, as the reported
+errors lack specific contextual information. Troubleshooting requires
+detailed log inspection, which is inconvenient.
+
+The error handling mechanism based on returned errors in Golang
+(https://pkg.go.dev/errors) has become quite usable after some time of
+development.
+
+So let’s bring the mechanism to c++11.
 
 ## Tutorial
 
