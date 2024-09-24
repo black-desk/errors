@@ -572,15 +572,18 @@ also use this library directly via raw `FetchContent`.
 1.  Use `FetchContent` to add this library:
 
     ``` cmake
-    include(FetchContent)
+    find_package(errors 0.2.0 QUIET)
+    if (NOT errors_FOUND)
+      include(FetchContent)
 
-    FetchContent_Declare(
-      errors
-      GIT_REPOSITORY https://github.com/black-desk/errors.git
-      GIT_TAG        v0.2.0 # or a later release
-    )
+      FetchContent_Declare(
+        errors
+        GIT_REPOSITORY https://github.com/black-desk/errors.git
+        GIT_TAG        v0.2.0 # or a later release
+      )
 
-    FetchContent_MakeAvailable(errors)
+      FetchContent_MakeAvailable(errors)
+    endif()
     ```
 
 2.  Link your target with `errors::errors` like this:
@@ -618,7 +621,7 @@ this library into your development environment, then use it via CMake’s
     your target like this:
 
     ``` cmake
-    find_package( errors 0.2.0 REQUIRED) # or a later release
+    find_package(errors 0.2.0 REQUIRED) # or a later release
 
     add_executable(demo main.cpp)
     target_link_libraries(demo PRIVATE errors::errors)
