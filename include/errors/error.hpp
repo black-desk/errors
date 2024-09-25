@@ -87,22 +87,8 @@ class error : public std::exception {
         [[nodiscard]]
         E *as()
         {
-                auto current = this;
-                while (current != nullptr) {
-                        auto result = dynamic_cast<E *>(current);
-                        if (result != nullptr) {
-                                return result;
-                        }
-
-                        auto current_with_cause =
-                                dynamic_cast<const with_cause *>(current);
-                        if (!current_with_cause) {
-                                return nullptr;
-                        }
-
-                        current = current_with_cause->cause().get();
-                }
-                return nullptr;
+                return const_cast<E *>(
+                        const_cast<const error *>(this)->as<E>());
         }
 
         [[nodiscard]]
