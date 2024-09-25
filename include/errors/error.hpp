@@ -280,6 +280,56 @@ inline error_ptr wrap(error_ptr &&cause, std::string message)
 }
 #endif
 
+class exception_error : public virtual errors::base_error {
+    public:
+        exception_error(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                errors::source_location location,
+#endif
+                errors::error_ptr &&cause,
+                std::exception_ptr exception_ptr = std::current_exception())
+                : base_error(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                          std::move(location),
+#endif
+                          std::move(cause))
+                , exception_ptr(std::move(exception_ptr))
+        {
+        }
+
+        const char *what() const noexcept override
+        {
+                try {
+                        std::rethrow_exception(exception_ptr);
+                } catch (const std::exception &e) {
+                        return e.what();
+                } catch (...) {
+                        return "unknown exception";
+                }
+        }
+
+        std::exception_ptr exception_ptr;
+};
+
+struct code_error : public errors::message_error {
+    public:
+        code_error(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                errors::source_location location,
+#endif
+                errors::error_ptr &&cause, std::string annotation, int code)
+                : message_error(
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
+                          std::move(location),
+#endif
+                          std::move(cause), std::move(annotation))
+                , code(code)
+        {
+        }
+
+        int code;
+};
+
 } // namespace errors
 
 #if not defined(ERRORS_DISABLE_OSTREAM)

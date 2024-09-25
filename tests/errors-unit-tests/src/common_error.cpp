@@ -1,3 +1,7 @@
+#include <fcntl.h>
+
+#include <cstdlib>
+#include <exception>
 #include <sstream>
 
 #include "catch2/catch_test_macros.hpp"
@@ -28,7 +32,7 @@ error_ptr fn2(unsigned int depth)
 }
 }
 
-TEST_CASE("common_error works", "[errors]")
+TEST_CASE("message_error works", "[errors]")
 {
         auto err = fn1();
         REQUIRE(err != nullptr);
@@ -39,7 +43,7 @@ TEST_CASE("common_error works", "[errors]")
         REQUIRE_THAT(ss.str(), Equals("error"));
 }
 
-TEST_CASE("nested common_error works", "[errors]")
+TEST_CASE("nested message_error works", "[errors]")
 {
         auto err = fn2(3);
         REQUIRE(err != nullptr);
@@ -63,18 +67,43 @@ TEST_CASE("nested common_error works", "[errors]")
         REQUIRE_THAT(ss.str(), Equals("depth=3: depth=2: depth=1: error"));
 }
 
+TEST_CASE("code_error works", "[errors]")
+{
+        auto path = "/file/not/exist";
+        auto fd = open(path, O_RDONLY);
+        assert(fd < 0);
+        auto code = errno;
+        auto err = make_error<errors::code_error>(
+                nullptr, "open " + std::string(path) + ": " + strerror(code),
+                code);
+        REQUIRE(err != nullptr);
+        REQUIRE_THAT(err->what(),
+                     Equals("open /file/not/exist: No such file or directory"));
+}
+
+TEST_CASE("exception_error works", "[errors]")
+{
+        try {
+                throw std::runtime_error("error");
+        } catch (...) {
+                auto err = make_error<errors::exception_error>(nullptr);
+                REQUIRE(err != nullptr);
+                REQUIRE_THAT(err->what(), Equals("error"));
+        }
+}
+
 #if defined(ERRORS_ENABLE_NLOHMANN_JSON_SUPPORT)
 
 #include "nlohmann/json.hpp"
 
-TEST_CASE("to_json works for common_error", "[errors][json]")
+TEST_CASE("to_json works for message_error", "[errors][json]")
 {
         auto err = fn1();
         nlohmann::json j = err;
         REQUIRE(j["message"] == "error");
 }
 
-TEST_CASE("to_json works for nested common_error", "[errors][json]")
+TEST_CASE("to_json works for nested message_error", "[errors][json]")
 {
         nlohmann::json j = fn2(3);
         REQUIRE(j["message"] == "depth=3");
