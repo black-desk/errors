@@ -243,11 +243,10 @@ struct [[nodiscard]] capture_location {
 #if defined(ERRORS_ENABLE_SOURCE_LOCATION)
 template <typename E, typename... Args>
 [[nodiscard]]
-inline error_ptr make_error(capture_location<error_ptr> &&cause, Args &&...args)
+inline error_ptr make_error(capture_location<error_ptr> &&cause, Args... args)
 {
         return std::make_unique<E>(std::move(cause.location),
-                                   std::move(cause.value),
-                                   std::forward<Args>(args)...);
+                                   std::move(cause.value), args...);
 }
 
 inline error_ptr wrap(capture_location<error_ptr> &&cause,
@@ -263,10 +262,9 @@ inline error_ptr wrap(capture_location<error_ptr> &&cause, std::string message)
 #else
 template <typename E, typename... Args>
 [[nodiscard]]
-inline error_ptr make_error(error_ptr &&cause, Args &&...args)
+inline error_ptr make_error(error_ptr &&cause, Args... args)
 {
-        return std::make_unique<E>(std::move(cause),
-                                   std::forward<Args>(args)...);
+        return std::make_unique<E>(std::move(cause), args...);
 }
 
 [[nodiscard]]
