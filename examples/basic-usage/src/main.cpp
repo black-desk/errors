@@ -1,10 +1,10 @@
-#include <filesystem>
 #include <iostream>
 
 #include "errors/error.hpp"
 
 using errors::error_ptr;
 using errors::make_error;
+using errors::message_error;
 using errors::wrap;
 
 // NOTE:
@@ -13,7 +13,7 @@ using errors::wrap;
 // you can return an error_ptr.
 error_ptr fn() noexcept
 {
-        return make_error("error occurs");
+        return make_error<message_error>(nullptr, "error occurs");
 };
 
 // NOTE:

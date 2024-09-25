@@ -4,6 +4,7 @@
 #include "errors/error.hpp"
 
 using errors::make_error;
+using errors::message_error;
 using errors::wrap;
 
 namespace local_ns
@@ -56,7 +57,9 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 void print_error_in_local_ns()
 {
         // Using the custom operator<<
-        std::cerr << "Error: " << wrap(wrap(make_error("error"))) << std::endl;
+        std::cerr << "Error: "
+                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << std::endl;
 }
 }
 
@@ -66,7 +69,9 @@ void print_error_in_global_ns()
         using errors::wrap;
 
         // Using the default operator<<
-        std::cerr << "Error: " << wrap(wrap(make_error("error"))) << std::endl;
+        std::cerr << "Error: "
+                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << std::endl;
 }
 
 int main()

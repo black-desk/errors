@@ -5,6 +5,7 @@
 
 using errors::error_ptr;
 using errors::make_error;
+using errors::message_error;
 using tl::expected;
 using tl::unexpected;
 
@@ -36,7 +37,8 @@ class stack_t {
 expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
-                return unexpected(make_error("underflow"));
+                return unexpected(
+                        make_error<message_error>(nullptr, "underflow"));
         }
 
         return data[--top];
@@ -45,7 +47,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
-                return make_error("overflow");
+                return make_error<message_error>(nullptr, "overflow");
         }
 
         data[top++] = value;

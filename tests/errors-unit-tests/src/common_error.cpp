@@ -7,6 +7,7 @@
 using ::Catch::Matchers::Equals;
 using ::errors::error_ptr;
 using ::errors::make_error;
+using ::errors::message_error;
 using ::errors::wrap;
 
 namespace
@@ -14,13 +15,13 @@ namespace
 
 error_ptr fn1()
 {
-        return make_error("error");
+        return make_error<message_error>(nullptr, "error");
 }
 
 error_ptr fn2(unsigned int depth)
 {
         if (depth == 0) {
-                return make_error("error");
+                return make_error<message_error>(nullptr, "error");
         }
         auto err = fn2(depth - 1);
         return wrap(std::move(err), "depth=" + std::to_string(depth));

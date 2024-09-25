@@ -109,8 +109,6 @@ error_ptr fn(stack_t &stack)
                     "something goes wrong");
 }
 
-void make_stack_error_omit_cause();
-
 int main()
 {
         stack_t stack;
@@ -138,29 +136,5 @@ int main()
         err = make_error<stack_error_t>(nullptr, 1);
         print_stack_error(err);
 
-        make_stack_error_omit_cause();
-
         return 0;
-}
-
-// NOTE:
-// Maybe you are tired to write make_error<stack_error_t>(nullptr,...)
-// as your error never caused by low-lever errors.
-// This is a trick to define your own `make_error` function for stack_error_t
-// which does not required the `cause` argument.
-
-template <typename T>
-error_ptr make_error(errors::capture_location<int> top) = delete;
-
-template <>
-error_ptr make_error<stack_error_t>(errors::capture_location<int> top)
-{
-        return std::make_unique<stack_error_t>(top.location, nullptr,
-                                               top.value);
-}
-
-void make_stack_error_omit_cause()
-{
-        auto err = make_error<stack_error_t>(1);
-        print_stack_error(err);
 }

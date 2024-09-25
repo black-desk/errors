@@ -52,9 +52,12 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 int main()
 {
         using errors::make_error;
+        using errors::message_error;
         using errors::wrap;
 
-        std::cerr << "Error: " << wrap(wrap(make_error("error"))) << std::endl;
+        std::cerr << "Error: "
+                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << std::endl;
 
         return 0;
 }

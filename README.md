@@ -67,13 +67,13 @@ A function or method want to return an error should return an
 `errors::error_ptr`, which is a `std::unique_ptr<error>`.
 
 ``` cpp
-#include <filesystem>
 #include <iostream>
 
 #include "errors/error.hpp"
 
 using errors::error_ptr;
 using errors::make_error;
+using errors::message_error;
 using errors::wrap;
 
 // NOTE:
@@ -82,7 +82,7 @@ using errors::wrap;
 // you can return an error_ptr.
 error_ptr fn() noexcept
 {
-        return make_error("error occurs");
+        return make_error<message_error>(nullptr, "error occurs");
 };
 
 // NOTE:
@@ -136,6 +136,7 @@ int main()
 
 using errors::error_ptr;
 using errors::make_error;
+using errors::message_error;
 using tl::expected;
 using tl::unexpected;
 
@@ -167,7 +168,8 @@ class stack_t {
 expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
-                return unexpected(make_error("underflow"));
+                return unexpected(
+                        make_error<message_error>(nullptr, "underflow"));
         }
 
         return data[--top];
@@ -176,7 +178,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
-                return make_error("overflow");
+                return make_error<message_error>(nullptr, "overflow");
         }
 
         data[top++] = value;
@@ -320,8 +322,6 @@ error_ptr fn(stack_t &stack)
                     "something goes wrong");
 }
 
-void make_stack_error_omit_cause();
-
 int main()
 {
         stack_t stack;
@@ -349,31 +349,7 @@ int main()
         err = make_error<stack_error_t>(nullptr, 1);
         print_stack_error(err);
 
-        make_stack_error_omit_cause();
-
         return 0;
-}
-
-// NOTE:
-// Maybe you are tired to write make_error<stack_error_t>(nullptr,...)
-// as your error never caused by low-lever errors.
-// This is a trick to define your own `make_error` function for stack_error_t
-// which does not required the `cause` argument.
-
-template <typename T>
-error_ptr make_error(errors::capture_location<int> top) = delete;
-
-template <>
-error_ptr make_error<stack_error_t>(errors::capture_location<int> top)
-{
-        return std::make_unique<stack_error_t>(top.location, nullptr,
-                                               top.value);
-}
-
-void make_stack_error_omit_cause()
-{
-        auto err = make_error<stack_error_t>(1);
-        print_stack_error(err);
 }
 ```
 
@@ -436,9 +412,12 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 int main()
 {
         using errors::make_error;
+        using errors::message_error;
         using errors::wrap;
 
-        std::cerr << "Error: " << wrap(wrap(make_error("error"))) << std::endl;
+        std::cerr << "Error: "
+                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << std::endl;
 
         return 0;
 }
@@ -453,6 +432,7 @@ int main()
 #include "errors/error.hpp"
 
 using errors::make_error;
+using errors::message_error;
 using errors::wrap;
 
 namespace local_ns
@@ -505,7 +485,9 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 void print_error_in_local_ns()
 {
         // Using the custom operator<<
-        std::cerr << "Error: " << wrap(wrap(make_error("error"))) << std::endl;
+        std::cerr << "Error: "
+                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << std::endl;
 }
 }
 
@@ -515,7 +497,9 @@ void print_error_in_global_ns()
         using errors::wrap;
 
         // Using the default operator<<
-        std::cerr << "Error: " << wrap(wrap(make_error("error"))) << std::endl;
+        std::cerr << "Error: "
+                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << std::endl;
 }
 
 int main()

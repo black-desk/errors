@@ -21,12 +21,15 @@ class error;
 
 class with_cause {
     public:
+        [[nodiscard]]
         virtual const std::unique_ptr<error> &cause() const & noexcept = 0;
+        [[nodiscard]]
         virtual std::unique_ptr<error> &cause() & noexcept = 0;
 };
 
 class with_source_location {
     public:
+        [[nodiscard]]
         virtual const source_location &location() const noexcept = 0;
 };
 
@@ -38,6 +41,7 @@ class error : public std::exception {
         error &operator=(error &&) = delete;
         error &operator=(const error &) = delete;
         template <typename E>
+        [[nodiscard]]
         bool is() const
         {
                 auto current = this;
@@ -58,6 +62,7 @@ class error : public std::exception {
         }
 
         template <typename E>
+        [[nodiscard]]
         const E *as() const
         {
                 auto current = this;
@@ -79,6 +84,7 @@ class error : public std::exception {
         }
 
         template <typename E>
+        [[nodiscard]]
         E *as()
         {
                 auto current = this;
@@ -99,11 +105,13 @@ class error : public std::exception {
                 return nullptr;
         }
 
+        [[nodiscard]]
         const std::type_info &type()
         {
                 return typeid(*this);
         }
 
+        [[nodiscard]]
         std::optional<std::unique_ptr<error>> cause()
         {
                 auto this_with_cause = dynamic_cast<with_cause *>(this);
@@ -116,6 +124,7 @@ class error : public std::exception {
                                        std::move(this_with_cause->cause()));
         }
 
+        [[nodiscard]]
         std::optional<source_location> location() const
         {
                 auto this_with_source_location =
@@ -217,6 +226,7 @@ class message_error : public base_error {
         std::optional<std::string> message_;
 };
 
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
 // NOTE:
 // This is a helper struct to automatically capture the source_location
 // for the caller of make_error with implicit conversion
@@ -226,9 +236,8 @@ class message_error : public base_error {
 // and https://stackoverflow.com/a/66402319.
 // See https://stackoverflow.com/questions/57547273/how-to-use-source-location-in-a-variadic-template-function
 template <typename T>
-struct capture_location {
+struct [[nodiscard]] capture_location {
         T value;
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
         source_location location;
         capture_location(std::nullptr_t value,
                          source_location location = source_location::current())
@@ -242,35 +251,17 @@ struct capture_location {
                 , location(std::move(location))
         {
         }
-#else
-        capture_location(std::nullptr_t value)
-                : value(value)
-        {
-        }
-        capture_location(T &&value)
-                : value(std::move(value))
-        {
-        }
-#endif
 };
+#endif
 
+#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
 template <typename E, typename... Args>
+[[nodiscard]]
 inline error_ptr make_error(capture_location<error_ptr> &&cause, Args &&...args)
 {
-        return std::make_unique<E>(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                std::move(cause.location),
-#endif
-                std::move(cause.value), std::forward<Args>(args)...);
-}
-
-inline error_ptr make_error(capture_location<const char *> message)
-{
-        return std::make_unique<message_error>(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                std::move(message.location),
-#endif
-                nullptr, message.value);
+        return std::make_unique<E>(std::move(cause.location),
+                                   std::move(cause.value),
+                                   std::forward<Args>(args)...);
 }
 
 inline error_ptr wrap(capture_location<error_ptr> &&cause,
@@ -283,6 +274,27 @@ inline error_ptr wrap(capture_location<error_ptr> &&cause, std::string message)
 {
         return make_error<message_error>(std::move(cause), std::move(message));
 }
+#else
+template <typename E, typename... Args>
+[[nodiscard]]
+inline error_ptr make_error(error_ptr &&cause, Args &&...args)
+{
+        return std::make_unique<E>(std::move(cause),
+                                   std::forward<Args>(args)...);
+}
+
+[[nodiscard]]
+inline error_ptr wrap(error_ptr &&cause, const char *message = nullptr)
+{
+        return make_error<message_error>(std::move(cause), message);
+}
+
+[[nodiscard]]
+inline error_ptr wrap(error_ptr &&cause, std::string message)
+{
+        return make_error<message_error>(std::move(cause), std::move(message));
+}
+#endif
 
 } // namespace errors
 
