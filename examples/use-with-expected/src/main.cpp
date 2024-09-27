@@ -1,11 +1,10 @@
 #include <iostream>
 
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 #include "tl/expected.hpp"
 
 using errors::error_ptr;
-using errors::make_error;
-using errors::message_error;
+using errors::impl::runtime_error;
 using tl::expected;
 using tl::unexpected;
 
@@ -38,7 +37,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
                 return unexpected(
-                        make_error<message_error>(nullptr, "underflow"));
+                        errors::make<runtime_error>::with("underflow"));
         }
 
         return data[--top];
@@ -47,7 +46,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
-                return make_error<message_error>(nullptr, "overflow");
+                return errors::make<runtime_error>::with("overflow");
         }
 
         data[top++] = value;

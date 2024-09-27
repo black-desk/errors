@@ -1,5 +1,5 @@
 set(link_libraries PRIVATE Catch2::Catch2WithMain errors::errors)
-set(compile_options PRIVATE -DERRORS_ENABLE_SOURCE_LOCATION)
+set(compile_options PRIVATE -DERRORS_ENABLE_SOURCE_LOCATION=1)
 
 if(errors_WITH_NLOHMANN_JSON)
   find_package(nlohmann_json 3.5.0 REQUIRED)

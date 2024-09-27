@@ -1,341 +1,71 @@
 #pragma once
-#include <cassert>
+
 #include <memory>
 #include <optional>
-#include <ostream>
-#include <string>
+#include <utility>
 
-#if not defined(ERRORS_SINGLE_HEADER_FILE)
-#include "errors/config.hpp"
-#include "errors/version.hpp"
-#endif
-
-#if not defined(ERRORS_SINGLE_HEADER_FILE)
+#include "errors/detail/interface.hpp"
 #include "errors/source_location.hpp"
-#endif
 
 namespace errors
 {
 
 class error;
 
-class with_cause {
-    public:
-        [[nodiscard]]
-        virtual const std::unique_ptr<error> &cause() const & noexcept = 0;
-        [[nodiscard]]
-        virtual std::unique_ptr<error> &cause() & noexcept = 0;
-};
+using error_ptr = std::unique_ptr<error>;
 
-class with_source_location {
+template <typename E>
+[[nodiscard]]
+bool is(const error &err) noexcept;
+
+template <typename E>
+[[nodiscard]]
+const E *as(const error &err) noexcept;
+
+class error : public virtual detail::interface {
     public:
         [[nodiscard]]
-        virtual const source_location &location() const noexcept = 0;
-};
+        virtual const char *what() const noexcept = 0;
+        [[nodiscard]]
+        virtual const error_ptr &cause() const & = 0;
+        [[nodiscard]]
+        virtual error_ptr cause() && = 0;
+        [[nodiscard]]
+        virtual std::optional<source_location> location() const = 0;
 
-class error : public std::exception {
-    public:
-        error() = default;
-        error(error &&) = delete;
-        error(const error &) = delete;
-        error &operator=(error &&) = delete;
-        error &operator=(const error &) = delete;
         template <typename E>
         [[nodiscard]]
         bool is() const
         {
-                auto current = this;
-                while (current != nullptr) {
-                        if (dynamic_cast<const E *>(current) != nullptr) {
-                                return true;
-                        }
-
-                        auto current_with_cause =
-                                dynamic_cast<const with_cause *>(current);
-                        if (!current_with_cause) {
-                                return false;
-                        }
-
-                        current = current_with_cause->cause().get();
-                }
-                return false;
+                return ::errors::is<E>(*this);
         }
 
         template <typename E>
         [[nodiscard]]
         const E *as() const
         {
-                auto current = this;
-                while (current != nullptr) {
-                        auto result = dynamic_cast<const E *>(current);
-                        if (result != nullptr) {
-                                return result;
-                        }
-
-                        auto current_with_cause =
-                                dynamic_cast<const with_cause *>(current);
-                        if (!current_with_cause) {
-                                return nullptr;
-                        }
-
-                        current = current_with_cause->cause().get();
-                }
-                return nullptr;
+                return ::errors::as<E>(*this);
         }
 
         template <typename E>
         [[nodiscard]]
         E *as()
         {
-                return const_cast<E *>(
-                        const_cast<const error *>(this)->as<E>());
-        }
-
-        [[nodiscard]]
-        const std::type_info &type()
-        {
-                return typeid(*this);
-        }
-
-        [[nodiscard]]
-        std::optional<std::unique_ptr<error>> cause()
-        {
-                auto this_with_cause = dynamic_cast<with_cause *>(this);
-                if (!this_with_cause) {
-                        return std::nullopt;
-                }
-                return this_with_cause->cause() == nullptr ?
-                               std::nullopt :
-                               std::optional(
-                                       std::move(this_with_cause->cause()));
-        }
-
-        [[nodiscard]]
-        std::optional<source_location> location() const
-        {
-                auto this_with_source_location =
-                        dynamic_cast<const with_source_location *>(this);
-                if (!this_with_source_location) {
-                        return std::nullopt;
-                }
-                return this_with_source_location->location();
+                return const_cast<E *>(std::as_const(*this).as<E>());
         }
 };
+static_assert(std::is_abstract<error>());
 
-using error_ptr = std::unique_ptr<error>;
-
-class base_error :
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-        public virtual with_source_location,
-#endif
-        public virtual with_cause,
-        public virtual error {
-    public:
-        base_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                source_location location,
-#endif
-                error_ptr &&cause)
-                : cause_(std::move(cause))
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                , location_(std::move(location))
-#endif
-        {
-        }
-
-        const std::unique_ptr<error> &cause() const & noexcept override
-        {
-                return this->cause_;
-        }
-        std::unique_ptr<error> &cause() & noexcept override
-        {
-                return this->cause_;
-        }
-
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-        const source_location &location() const noexcept override
-        {
-                return this->location_;
-        }
-#endif
-
-    private:
-        error_ptr cause_;
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-        source_location location_;
-#endif
-};
-
-class message_error : public base_error {
-    public:
-        message_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                source_location location,
-#endif
-                error_ptr &&cause, const char *message)
-                : base_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                          std::move(location),
-#endif
-                          std::move(cause))
-
-        {
-                if (!message) {
-                        return;
-                }
-                this->message_ = message;
-        }
-
-        message_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                source_location location,
-#endif
-                error_ptr &&cause, std::string message)
-                : base_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                          std::move(location),
-#endif
-                          std::move(cause))
-                , message_(std::move(message))
-        {
-        }
-
-        const char *what() const noexcept override
-        {
-                if (!this->message_) {
-                        return "";
-                }
-                return this->message_->c_str();
-        }
-
-    private:
-        std::optional<std::string> message_;
-};
-
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-// NOTE:
-// This is a helper struct to automatically capture the source_location
-// for the caller of make_error with implicit conversion
-// from T or nullptr_t to capture_location<error_ptr>.
-// This trick inspired by
-// answers from https://stackoverflow.com/a/57548488
-// and https://stackoverflow.com/a/66402319.
-// See https://stackoverflow.com/questions/57547273/how-to-use-source-location-in-a-variadic-template-function
-template <typename T>
-struct [[nodiscard]] capture_location {
-        T value;
-        source_location location;
-        capture_location(std::nullptr_t value,
-                         source_location location = source_location::current())
-                : value(std::move(value))
-                , location(std::move(location))
-        {
-        }
-        capture_location(T value,
-                         source_location location = source_location::current())
-                : value(std::move(value))
-                , location(std::move(location))
-        {
-        }
-};
-#endif
-
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-template <typename E, typename... Args>
-[[nodiscard]]
-inline error_ptr make_error(capture_location<error_ptr> &&cause, Args... args)
-{
-        return std::make_unique<E>(std::move(cause.location),
-                                   std::move(cause.value), args...);
 }
-
-inline error_ptr wrap(capture_location<error_ptr> &&cause,
-                      const char *message = nullptr)
-{
-        return make_error<message_error>(std::move(cause), message);
-}
-
-inline error_ptr wrap(capture_location<error_ptr> &&cause, std::string message)
-{
-        return make_error<message_error>(std::move(cause), std::move(message));
-}
-#else
-template <typename E, typename... Args>
-[[nodiscard]]
-inline error_ptr make_error(error_ptr &&cause, Args... args)
-{
-        return std::make_unique<E>(std::move(cause), args...);
-}
-
-[[nodiscard]]
-inline error_ptr wrap(error_ptr &&cause, const char *message = nullptr)
-{
-        return make_error<message_error>(std::move(cause), message);
-}
-
-[[nodiscard]]
-inline error_ptr wrap(error_ptr &&cause, std::string message)
-{
-        return make_error<message_error>(std::move(cause), std::move(message));
-}
-#endif
-
-class exception_error : public virtual errors::base_error {
-    public:
-        exception_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                errors::source_location location,
-#endif
-                errors::error_ptr &&cause,
-                std::exception_ptr exception_ptr = std::current_exception())
-                : base_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                          std::move(location),
-#endif
-                          std::move(cause))
-                , exception_ptr(std::move(exception_ptr))
-        {
-        }
-
-        const char *what() const noexcept override
-        {
-                try {
-                        std::rethrow_exception(exception_ptr);
-                } catch (const std::exception &e) {
-                        return e.what();
-                } catch (...) {
-                        return "unknown exception";
-                }
-        }
-
-        std::exception_ptr exception_ptr;
-};
-
-struct code_error : public errors::message_error {
-    public:
-        code_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                errors::source_location location,
-#endif
-                errors::error_ptr &&cause, std::string annotation, int code)
-                : message_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                          std::move(location),
-#endif
-                          std::move(cause), std::move(annotation))
-                , code(code)
-        {
-        }
-
-        int code;
-};
-
-} // namespace errors
 
 #if not defined(ERRORS_DISABLE_OSTREAM)
+
+#include <cassert>
+#include <ostream>
+
 inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 {
-        auto current = err.get();
+        const auto *current = err.get();
 
         if (!current) {
                 os << "no error";
@@ -357,13 +87,7 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
                         printed = true;
                 }
 
-                auto current_with_cause =
-                        dynamic_cast<const errors::with_cause *>(current);
-                if (!current_with_cause) {
-                        break;
-                }
-
-                current = current_with_cause->cause().get();
+                current = current->cause().get();
         }
 
         return os;
@@ -380,7 +104,7 @@ namespace nlohmann
 {
 #endif
 template <>
-struct adl_serializer<::errors::error_ptr> {
+struct adl_serializer< ::errors::error_ptr> {
         static void to_json(::nlohmann::json &j, const ::errors::error_ptr &err)
         {
                 if (!err) {
@@ -395,11 +119,7 @@ struct adl_serializer<::errors::error_ptr> {
 
                 j["message"] = err->what();
 
-                auto cause = err->cause().value_or(nullptr);
-                if (!cause) {
-                        return;
-                }
-                j["caused_by"] = cause;
+                j["caused_by"] = err->cause();
         }
 };
 #if defined(NLOHMANN_JSON_NAMESPACE_BEGIN) && \
