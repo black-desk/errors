@@ -65,10 +65,9 @@ cd ..
 
 podman run -it --rm \
 	-v "$PWD:/data" \
-	-w /data/docs \
 	docker.io/blackdesk/pandocx:latest \
-	--template ./README.template.md \
-	"README.md" -o "../README.md" -t gfm-yaml_metadata_block \
+	--template ./.README.template.md \
+	".README.md" -o "./README.md" -t gfm-yaml_metadata_block \
 	-s \
 	-V toc-title:"Table of Contents" \
 	--shift-heading-level-by=1 \
