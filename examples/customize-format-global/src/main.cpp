@@ -6,11 +6,11 @@
 // please define ERRORS_DISABLE_OSTREAM
 // before include any header files from `errors`
 #define ERRORS_DISABLE_OSTREAM
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 
 inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 {
-        auto current = err.get();
+        const auto *current = err.get();
 
         if (!current) {
                 os << "no error";
@@ -37,13 +37,7 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
                 assert(what);
                 os << what;
 
-                auto current_with_cause =
-                        dynamic_cast<const errors::with_cause *>(current);
-                if (!current_with_cause) {
-                        break;
-                }
-
-                current = current_with_cause->cause().get();
+                current = current->cause().get();
         }
 
         return os;
@@ -51,12 +45,11 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 
 int main()
 {
-        using errors::make_error;
-        using errors::message_error;
+        using errors::impl::runtime_error;
         using errors::wrap;
 
         std::cerr << "Error: "
-                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << wrap(wrap(errors::make<runtime_error>::with("error")))
                   << std::endl;
 
         return 0;

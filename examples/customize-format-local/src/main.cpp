@@ -1,10 +1,9 @@
 #include <filesystem>
 #include <iostream>
 
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 
-using errors::make_error;
-using errors::message_error;
+using errors::impl::runtime_error;
 using errors::wrap;
 
 namespace local_ns
@@ -15,7 +14,7 @@ namespace local_ns
 // override the default operator<< outside of this namespace.
 inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 {
-        auto current = err.get();
+        const auto *current = err.get();
 
         if (!current) {
                 os << "no error";
@@ -42,13 +41,7 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
                 assert(what);
                 os << what;
 
-                auto current_with_cause =
-                        dynamic_cast<const errors::with_cause *>(current);
-                if (!current_with_cause) {
-                        break;
-                }
-
-                current = current_with_cause->cause().get();
+                current = current->cause().get();
         }
 
         return os;
@@ -58,19 +51,18 @@ void print_error_in_local_ns()
 {
         // Using the custom operator<<
         std::cerr << "Error: "
-                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << wrap(wrap(errors::make<runtime_error>::with("error")))
                   << std::endl;
 }
 }
 
 void print_error_in_global_ns()
 {
-        using errors::make_error;
         using errors::wrap;
 
         // Using the default operator<<
         std::cerr << "Error: "
-                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << wrap(wrap(errors::make<runtime_error>::with("error")))
                   << std::endl;
 }
 

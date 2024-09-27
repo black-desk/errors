@@ -86,14 +86,38 @@ pfl_add_library(
   LIBRARY_TYPE
   HEADER_ONLY
   SOURCES
-  # find -regex '\./\(src\|include\)/.+\.[ch]\(pp\)?\(\.in\)?' -type f | sort
-  ./include/errors/config.hpp.in
-  ./include/errors/error.hpp
-  ./include/errors/source_location.hpp
-  ./include/errors/version.hpp
-  ./src/errors/config.cpp
-  ./src/errors/error.cpp
-  ./src/errors/version.cpp
+  include/errors/config.hpp.in
+  include/errors/detail/interface.hpp
+  include/errors/error.hpp
+  include/errors/errors.hpp
+  include/errors/impl/base_error.hpp
+  include/errors/impl/code_error.hpp
+  include/errors/impl/error_with_cause.hpp
+  include/errors/impl/exception_error.hpp
+  include/errors/impl/runtime_error.hpp
+  include/errors/impl/system_error.hpp
+  include/errors/impl/wrap_error.hpp
+  include/errors/make.hpp
+  include/errors/source_location.hpp
+  include/errors/utils.hpp
+  include/errors/version.hpp
+  include/errors/wrap.hpp
+  src/errors/config.cpp
+  src/errors/detail/interface.cpp
+  src/errors/error.cpp
+  src/errors/errors.cpp
+  src/errors/impl/base_error.cpp
+  src/errors/impl/code_error.cpp
+  src/errors/impl/error_with_cause.cpp
+  src/errors/impl/exception_error.cpp
+  src/errors/impl/runtime_error.cpp
+  src/errors/impl/system_error.cpp
+  src/errors/impl/wrap_error.cpp
+  src/errors/make.cpp
+  src/errors/source_location.cpp
+  src/errors/utils.cpp
+  src/errors/version.cpp
+  src/errors/wrap.cpp
   EXAMPLES
   advanced-usage
   basic-usage
@@ -105,13 +129,3 @@ pfl_add_library(
   COMPILE_FEATURES
   INTERFACE
   cxx_std_11)
-
-file(READ ${CMAKE_CURRENT_BINARY_DIR}/include/errors/config.hpp
-     ERRORS_CONFIG_HEADER_FILE)
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/include/errors/version.hpp
-     ERRORS_VERSION_HEADER_FILE)
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/include/errors/source_location.hpp
-     ERRORS_SOURCE_LOCATION_HEADER_FILE)
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/include/errors/error.hpp
-     ERRORS_ERROR_HEADER_FILE)
-configure_file(./misc/errors.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/errors.hpp)

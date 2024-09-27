@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 #include "tl/expected.hpp"
 
 using errors::error_ptr;
-using errors::make_error;
+using errors::impl::runtime_error;
 using errors::wrap;
 using tl::expected;
 using tl::unexpected;
@@ -27,23 +27,15 @@ class stack_t {
 // the machine friendly error context information.
 // It can be used to generate developer and
 // user friendly error message later.
-struct stack_error_t : public errors::message_error {
+struct stack_error_t : public runtime_error {
     public:
         // NOTE:
-        // Write a constructor whichs first two arguments are
-        // `source_location` and `error_ptr`
-        // to make this error type compatible with errors::make_error.
-        stack_error_t(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                errors::source_location location,
-#endif
-                error_ptr &&cause, int top)
-                : message_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                          std::move(location),
-#endif
-                          std::move(cause),
-                          "stack error [top=" + std::to_string(top) + "]")
+        // Write a constructor whichs last argument is `source_location`
+        // to make this error type compatible with errors::make.
+        stack_error_t(int top, errors::source_location location)
+                : runtime_error("stack error [top=" + std::to_string(top) + "]",
+                                std::move(location))
+
                 , top(top)
         {
         }
@@ -54,7 +46,7 @@ struct stack_error_t : public errors::message_error {
 expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
-                return unexpected(make_error<stack_error_t>(nullptr, top));
+                return unexpected(errors::make<stack_error_t>::with(top));
         }
 
         return data[--top];
@@ -63,7 +55,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
-                return make_error<stack_error_t>(nullptr, top);
+                return errors::make<stack_error_t>::with(top);
         }
 
         data[top++] = value;
@@ -105,8 +97,8 @@ error_ptr fn(stack_t &stack)
 {
         auto value = stack.pop();
         assert(!value);
-        return wrap(wrap(wrap(std::move(value).error())),
-                    "something goes wrong");
+        return errors::wrap("something goes wrong",
+                            wrap(wrap(std::move(value.error()))));
 }
 
 int main()
@@ -133,7 +125,7 @@ int main()
         assert(err != nullptr);
         print_stack_error(err);
 
-        err = make_error<stack_error_t>(nullptr, 1);
+        err = errors::make<stack_error_t>::with(1);
         print_stack_error(err);
 
         return 0;

@@ -1,11 +1,9 @@
 #include <iostream>
 
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 
 using errors::error_ptr;
-using errors::make_error;
-using errors::message_error;
-using errors::wrap;
+using errors::impl::runtime_error;
 
 // NOTE:
 // If you have a function which might goes wrong,
@@ -13,14 +11,15 @@ using errors::wrap;
 // you can return an error_ptr.
 error_ptr fn() noexcept
 {
-        return make_error<message_error>(nullptr, "error occurs");
+        return errors::make<runtime_error>::with("error occurs");
 };
 
 // NOTE:
 // You can return an wrapped error_ptr using the `wrap` function.
 error_ptr fn2() noexcept
 {
-        return wrap(fn());
+        auto err = fn();
+        return errors::wrap(fn());
 }
 
 int main()
