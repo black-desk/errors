@@ -16,13 +16,13 @@ class base_error : public virtual error {
         {
         }
 
-        const std::unique_ptr<error> &cause() const & override
+        const error_ptr &cause() const & override
         {
                 static const error_ptr null = nullptr;
                 return null;
         }
 
-        std::unique_ptr<error> cause() && override
+        error_ptr cause() && override
         {
                 return nullptr;
         }

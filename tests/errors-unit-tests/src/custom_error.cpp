@@ -42,14 +42,13 @@ TEST_CASE("custom error works", "[errors][source_location]")
         using Catch::Matchers::EndsWith;
         using Catch::Matchers::Equals;
 
-        auto err = fn(3);
+        auto current_err = fn(3);
 
-        auto current_err = err.get();
         REQUIRE(current_err != nullptr);
         REQUIRE(current_err->what() != nullptr);
         REQUIRE_THAT(current_err->what(), Equals("[depth=3]"));
-        REQUIRE(current_err->as<fn_error_t>() != nullptr);
-        REQUIRE(current_err->as<fn_error_t>()->depth == 3);
+        REQUIRE(current_err.as<fn_error_t>() != nullptr);
+        REQUIRE(current_err.as<fn_error_t>()->depth == 3);
         {
                 const auto &location = current_err->location();
                 REQUIRE_THAT(location->function_name(), Equals("fn"));
@@ -57,12 +56,12 @@ TEST_CASE("custom error works", "[errors][source_location]")
                              EndsWith("custom_error.cpp"));
         }
 
-        current_err = current_err->cause().get();
+        current_err = std::move(*current_err).cause();
         REQUIRE(current_err != nullptr);
         REQUIRE(current_err->what() != nullptr);
         REQUIRE_THAT(current_err->what(), Equals("[depth=2]"));
-        REQUIRE(current_err->as<fn_error_t>() != nullptr);
-        REQUIRE(current_err->as<fn_error_t>()->depth == 2);
+        REQUIRE(current_err.as<fn_error_t>() != nullptr);
+        REQUIRE(current_err.as<fn_error_t>()->depth == 2);
         {
                 const auto &location = current_err->location();
                 REQUIRE_THAT(location->function_name(), Equals("fn"));
@@ -70,12 +69,12 @@ TEST_CASE("custom error works", "[errors][source_location]")
                              EndsWith("custom_error.cpp"));
         }
 
-        current_err = current_err->cause().get();
+        current_err = std::move(*current_err).cause();
         REQUIRE(current_err != nullptr);
         REQUIRE(current_err->what() != nullptr);
         REQUIRE_THAT(current_err->what(), Equals("[depth=1]"));
-        REQUIRE(current_err->as<fn_error_t>() != nullptr);
-        REQUIRE(current_err->as<fn_error_t>()->depth == 1);
+        REQUIRE(current_err.as<fn_error_t>() != nullptr);
+        REQUIRE(current_err.as<fn_error_t>()->depth == 1);
         {
                 const auto &location = current_err->location();
                 REQUIRE_THAT(location->function_name(), Equals("fn"));
@@ -83,12 +82,12 @@ TEST_CASE("custom error works", "[errors][source_location]")
                              EndsWith("custom_error.cpp"));
         }
 
-        current_err = current_err->cause().get();
+        current_err = std::move(*current_err).cause();
         REQUIRE(current_err != nullptr);
         REQUIRE(current_err->what() != nullptr);
         REQUIRE_THAT(current_err->what(), Equals("[depth=0]"));
-        REQUIRE(current_err->as<fn_error_t>() != nullptr);
-        REQUIRE(current_err->as<fn_error_t>()->depth == 0);
+        REQUIRE(current_err.as<fn_error_t>() != nullptr);
+        REQUIRE(current_err.as<fn_error_t>()->depth == 0);
         {
                 const auto &location = current_err->location();
                 REQUIRE_THAT(location->function_name(), Equals("fn"));
@@ -96,11 +95,11 @@ TEST_CASE("custom error works", "[errors][source_location]")
                              EndsWith("custom_error.cpp"));
         }
 
-        current_err = current_err->cause().get();
+        current_err = std::move(*current_err).cause();
         REQUIRE(current_err != nullptr);
         REQUIRE(current_err->what() != nullptr);
         REQUIRE_THAT(current_err->what(), Equals("error"));
-        REQUIRE(current_err->as<fn_error_t>() == nullptr);
+        REQUIRE(current_err.as<fn_error_t>() == nullptr);
         {
                 const auto &location = current_err->location();
                 REQUIRE_THAT(location->function_name(), Equals("fn"));
