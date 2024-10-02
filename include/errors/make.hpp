@@ -2,14 +2,10 @@
 
 #include <memory>
 
-#include "errors/source_location.hpp"
+#include "errors/error.hpp"
 
 namespace errors
 {
-
-class error;
-
-using error_ptr = std::unique_ptr<error>;
 
 template <typename E>
 class make {

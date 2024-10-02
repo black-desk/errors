@@ -12,8 +12,6 @@ namespace errors
 
 class error;
 
-using error_ptr = std::unique_ptr<error>;
-
 template <typename E>
 [[nodiscard]]
 bool is(const error &err) noexcept;
@@ -21,6 +19,8 @@ bool is(const error &err) noexcept;
 template <typename E>
 [[nodiscard]]
 const E *as(const error &err) noexcept;
+
+class error_ptr;
 
 class error : public virtual detail::interface {
     public:
@@ -32,19 +32,49 @@ class error : public virtual detail::interface {
         virtual error_ptr cause() && = 0;
         [[nodiscard]]
         virtual std::optional<source_location> location() const = 0;
+};
+static_assert(std::is_abstract<error>());
+
+class error_ptr : public std::unique_ptr<error> {
+    public:
+        using std::unique_ptr<error>::unique_ptr;
+
+        [[nodiscard]]
+        const char *what() const noexcept
+        {
+                return this->get()->what();
+        }
+
+        [[nodiscard]]
+        const error_ptr &cause() const &
+        {
+                return this->get()->cause();
+        }
+
+        [[nodiscard]]
+        error_ptr cause() &&
+        {
+                return std::move(**this).cause();
+        }
+
+        [[nodiscard]]
+        std::optional<source_location> location() const
+        {
+                return this->get()->location();
+        }
 
         template <typename E>
         [[nodiscard]]
         bool is() const
         {
-                return ::errors::is<E>(*this);
+                return ::errors::is<E>(**this);
         }
 
         template <typename E>
         [[nodiscard]]
         const E *as() const
         {
-                return ::errors::as<E>(*this);
+                return ::errors::as<E>(**this);
         }
 
         template <typename E>
@@ -54,8 +84,7 @@ class error : public virtual detail::interface {
                 return const_cast<E *>(std::as_const(*this).as<E>());
         }
 };
-static_assert(std::is_abstract<error>());
-
+static_assert(!std::is_abstract<error_ptr>());
 }
 
 #if not defined(ERRORS_DISABLE_OSTREAM)

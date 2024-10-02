@@ -3,8 +3,8 @@
 
 #include "errors/errors.hpp"
 
-using errors::impl::runtime_error;
 using errors::wrap;
+using errors::impl::runtime_error;
 
 namespace local_ns
 {

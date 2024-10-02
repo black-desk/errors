@@ -4,8 +4,8 @@
 #include "tl/expected.hpp"
 
 using errors::error_ptr;
-using errors::impl::runtime_error;
 using errors::wrap;
+using errors::impl::runtime_error;
 using tl::expected;
 using tl::unexpected;
 
@@ -71,13 +71,13 @@ void print_stack_error(const error_ptr &err)
                 return;
         }
 
-        if (!err->is<stack_error_t>()) {
+        if (!err.is<stack_error_t>()) {
                 return;
         }
 
         std::cout << "Stack error occurs" << std::endl;
 
-        auto stack_error = err->as<stack_error_t>();
+        auto stack_error = err.as<stack_error_t>();
         assert(stack_error != nullptr);
 
         if (stack_error->top == 0) {

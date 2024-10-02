@@ -16,12 +16,12 @@ class error_with_cause : public base_error {
         {
         }
 
-        const std::unique_ptr<error> &cause() const & override
+        const error_ptr &cause() const & override
         {
                 return this->cause_;
         }
 
-        std::unique_ptr<error> cause() && override
+        error_ptr cause() && override
         {
                 return std::move(this->cause_);
         }

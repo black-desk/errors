@@ -45,8 +45,8 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 
 int main()
 {
-        using errors::impl::runtime_error;
         using errors::wrap;
+        using errors::impl::runtime_error;
 
         std::cerr << "Error: "
                   << wrap(wrap(errors::make<runtime_error>::with("error")))
