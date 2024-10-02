@@ -12,9 +12,28 @@ namespace errors
 namespace impl
 {
 
+/// @brief
+/// An error that has a code.
+///
+/// @tparam Code
+/// The type of the code.
+///
+/// @details
+/// This class is used to create an error that has a code.
 template <typename Code>
 class code_error : public runtime_error {
     public:
+        /// @brief
+        /// Constructor with message, code and source_location.
+        ///
+        /// @param message
+        /// The message.
+        ///
+        /// @param code
+        /// The code.
+        ///
+        /// @param location
+        /// The source location.
         code_error(const std::string &message, Code code,
                    source_location location)
                 : runtime_error(message, std::move(location))
@@ -28,6 +47,8 @@ class code_error : public runtime_error {
                 return this->message.c_str();
         }
 
+        /// @brief
+        /// The error code.
         Code code;
 };
 

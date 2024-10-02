@@ -30,13 +30,15 @@ project(
 include(GitSemver)
 gitsemver(PROJECT_VERSION)
 
+pfl_init()
+
 option(errors_WITH_NLOHMANN_JSON "Build examples and tests with nlohmann_json"
        ${PROJECT_IS_TOP_LEVEL})
 option(errors_WITH_TL_EXPECTED
        "Build examples and tests with TartanLlama/expected"
        ${PROJECT_IS_TOP_LEVEL})
-
-pfl_init()
+option(errors_GENERATE_DOCUMENTATION "Generate documentation"
+       ${PROJECT_IS_TOP_LEVEL})
 
 macro(cpm_add_dependencies)
   if(errors_WITH_NLOHMANN_JSON)
@@ -89,6 +91,7 @@ pfl_add_library(
   include/errors/config.hpp.in
   include/errors/detail/interface.hpp
   include/errors/error.hpp
+  include/errors/error_ptr.hpp
   include/errors/errors.hpp
   include/errors/impl/base_error.hpp
   include/errors/impl/code_error.hpp
@@ -105,9 +108,11 @@ pfl_add_library(
   src/errors/config.cpp
   src/errors/detail/interface.cpp
   src/errors/error.cpp
+  src/errors/error_ptr.cpp
   src/errors/errors.cpp
   src/errors/impl/base_error.cpp
   src/errors/impl/code_error.cpp
+  src/errors/impl/error_without_cause.cpp
   src/errors/impl/error_with_cause.cpp
   src/errors/impl/exception_error.cpp
   src/errors/impl/runtime_error.cpp
@@ -129,3 +134,17 @@ pfl_add_library(
   COMPILE_FEATURES
   INTERFACE
   cxx_std_11)
+
+if(errors_GENERATE_DOCUMENTATION)
+  find_package(Doxygen REQUIRED COMPONENTS dot OPTIONAL_COMPONENTS mscgen dia)
+  set(DOXYGEN_STRIP_FROM_INC_PATH
+      "${PROJECT_SOURCE_DIR}/include;${PROJECT_BINARY_DIR}/include")
+  set(DOXYGEN_EXAMPLE_PATH "${PROJECT_SOURCE_DIR};${PROJECT_BINARY_DIR}")
+  doxygen_add_docs(
+    doxygen ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_BINARY_DIR}/include ${PROJECT_BINARY_DIR}/src ALL
+    COMMENT "Generate documentation with doxygen")
+  set_target_properties(doxygen PROPERTIES DEPENDS errors::errors)
+  install(DIRECTORY ${PROJECT_BINARY_DIR}/html
+          DESTINATION share/doc/${PROJECT_NAME})
+endif()

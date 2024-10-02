@@ -69,12 +69,10 @@ A function or method want to return an error should return an
 ``` cpp
 #include <iostream>
 
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 
 using errors::error_ptr;
-using errors::make_error;
-using errors::message_error;
-using errors::wrap;
+using errors::impl::runtime_error;
 
 // NOTE:
 // If you have a function which might goes wrong,
@@ -82,14 +80,15 @@ using errors::wrap;
 // you can return an error_ptr.
 error_ptr fn() noexcept
 {
-        return make_error<message_error>(nullptr, "error occurs");
+        return errors::make<runtime_error>::with("error occurs");
 };
 
 // NOTE:
 // You can return an wrapped error_ptr using the `wrap` function.
 error_ptr fn2() noexcept
 {
-        return wrap(fn());
+        auto err = fn();
+        return errors::wrap(fn());
 }
 
 int main()
@@ -131,12 +130,11 @@ int main()
 ``` cpp
 #include <iostream>
 
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 #include "tl/expected.hpp"
 
 using errors::error_ptr;
-using errors::make_error;
-using errors::message_error;
+using errors::impl::runtime_error;
 using tl::expected;
 using tl::unexpected;
 
@@ -169,7 +167,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
                 return unexpected(
-                        make_error<message_error>(nullptr, "underflow"));
+                        errors::make<runtime_error>::with("underflow"));
         }
 
         return data[--top];
@@ -178,7 +176,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
-                return make_error<message_error>(nullptr, "overflow");
+                return errors::make<runtime_error>::with("overflow");
         }
 
         data[top++] = value;
@@ -213,12 +211,12 @@ int main()
 ``` cpp
 #include <iostream>
 
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 #include "tl/expected.hpp"
 
 using errors::error_ptr;
-using errors::make_error;
 using errors::wrap;
+using errors::impl::runtime_error;
 using tl::expected;
 using tl::unexpected;
 
@@ -240,23 +238,15 @@ class stack_t {
 // the machine friendly error context information.
 // It can be used to generate developer and
 // user friendly error message later.
-struct stack_error_t : public errors::message_error {
+struct stack_error_t : public runtime_error {
     public:
         // NOTE:
-        // Write a constructor whichs first two arguments are
-        // `source_location` and `error_ptr`
-        // to make this error type compatible with errors::make_error.
-        stack_error_t(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                errors::source_location location,
-#endif
-                error_ptr &&cause, int top)
-                : message_error(
-#if defined(ERRORS_ENABLE_SOURCE_LOCATION)
-                          std::move(location),
-#endif
-                          std::move(cause),
-                          "stack error [top=" + std::to_string(top) + "]")
+        // Write a constructor whichs last argument is `source_location`
+        // to make this error type compatible with errors::make.
+        stack_error_t(int top, errors::source_location location)
+                : runtime_error("stack error [top=" + std::to_string(top) + "]",
+                                std::move(location))
+
                 , top(top)
         {
         }
@@ -267,7 +257,7 @@ struct stack_error_t : public errors::message_error {
 expected<int, error_ptr> stack_t::pop() noexcept
 {
         if (top == 0) {
-                return unexpected(make_error<stack_error_t>(nullptr, top));
+                return unexpected(errors::make<stack_error_t>::with(top));
         }
 
         return data[--top];
@@ -276,7 +266,7 @@ expected<int, error_ptr> stack_t::pop() noexcept
 error_ptr stack_t::push(int value) noexcept
 {
         if (top == MAX_SIZE) {
-                return make_error<stack_error_t>(nullptr, top);
+                return errors::make<stack_error_t>::with(top);
         }
 
         data[top++] = value;
@@ -292,13 +282,13 @@ void print_stack_error(const error_ptr &err)
                 return;
         }
 
-        if (!err->is<stack_error_t>()) {
+        if (!err.is<stack_error_t>()) {
                 return;
         }
 
         std::cout << "Stack error occurs" << std::endl;
 
-        auto stack_error = err->as<stack_error_t>();
+        auto stack_error = err.as<stack_error_t>();
         assert(stack_error != nullptr);
 
         if (stack_error->top == 0) {
@@ -318,8 +308,8 @@ error_ptr fn(stack_t &stack)
 {
         auto value = stack.pop();
         assert(!value);
-        return wrap(wrap(wrap(std::move(value).error())),
-                    "something goes wrong");
+        return errors::wrap("something goes wrong",
+                            wrap(wrap(std::move(value.error()))));
 }
 
 int main()
@@ -346,7 +336,7 @@ int main()
         assert(err != nullptr);
         print_stack_error(err);
 
-        err = make_error<stack_error_t>(nullptr, 1);
+        err = errors::make<stack_error_t>::with(1);
         print_stack_error(err);
 
         return 0;
@@ -366,11 +356,11 @@ int main()
 // please define ERRORS_DISABLE_OSTREAM
 // before include any header files from `errors`
 #define ERRORS_DISABLE_OSTREAM
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 
 inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 {
-        auto current = err.get();
+        const auto *current = err.get();
 
         if (!current) {
                 os << "no error";
@@ -397,13 +387,7 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
                 assert(what);
                 os << what;
 
-                auto current_with_cause =
-                        dynamic_cast<const errors::with_cause *>(current);
-                if (!current_with_cause) {
-                        break;
-                }
-
-                current = current_with_cause->cause().get();
+                current = current->cause().get();
         }
 
         return os;
@@ -411,12 +395,11 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 
 int main()
 {
-        using errors::make_error;
-        using errors::message_error;
         using errors::wrap;
+        using errors::impl::runtime_error;
 
         std::cerr << "Error: "
-                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << wrap(wrap(errors::make<runtime_error>::with("error")))
                   << std::endl;
 
         return 0;
@@ -429,11 +412,10 @@ int main()
 #include <filesystem>
 #include <iostream>
 
-#include "errors/error.hpp"
+#include "errors/errors.hpp"
 
-using errors::make_error;
-using errors::message_error;
 using errors::wrap;
+using errors::impl::runtime_error;
 
 namespace local_ns
 {
@@ -443,7 +425,7 @@ namespace local_ns
 // override the default operator<< outside of this namespace.
 inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
 {
-        auto current = err.get();
+        const auto *current = err.get();
 
         if (!current) {
                 os << "no error";
@@ -470,13 +452,7 @@ inline std::ostream &operator<<(std::ostream &os, const errors::error_ptr &err)
                 assert(what);
                 os << what;
 
-                auto current_with_cause =
-                        dynamic_cast<const errors::with_cause *>(current);
-                if (!current_with_cause) {
-                        break;
-                }
-
-                current = current_with_cause->cause().get();
+                current = current->cause().get();
         }
 
         return os;
@@ -486,19 +462,18 @@ void print_error_in_local_ns()
 {
         // Using the custom operator<<
         std::cerr << "Error: "
-                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << wrap(wrap(errors::make<runtime_error>::with("error")))
                   << std::endl;
 }
 }
 
 void print_error_in_global_ns()
 {
-        using errors::make_error;
         using errors::wrap;
 
         // Using the default operator<<
         std::cerr << "Error: "
-                  << wrap(wrap(make_error<message_error>(nullptr, "error")))
+                  << wrap(wrap(errors::make<runtime_error>::with("error")))
                   << std::endl;
 }
 

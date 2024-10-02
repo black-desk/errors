@@ -1,6 +1,7 @@
 #pragma once
 
 #include "errors/error.hpp"
+#include "errors/error_ptr.hpp"
 
 namespace errors
 {

@@ -7,24 +7,22 @@ namespace errors
 namespace impl
 {
 
-// A base class for all other builtin error types to derived from,
-// which implement the default cause and location method.
+/// @brief
+/// A base error class.
+///
+/// @details
+/// It implements the location method
+/// for all other builtin error types to derived from.
 class base_error : public virtual error {
     public:
+        /// @brief
+        /// Constructor with source_location.
+        ///
+        /// @param loc
+        /// The source location.
         base_error(source_location loc)
                 : loc(std::move(loc))
         {
-        }
-
-        const error_ptr &cause() const & override
-        {
-                static const error_ptr null = nullptr;
-                return null;
-        }
-
-        error_ptr cause() && override
-        {
-                return nullptr;
         }
 
         std::optional<source_location> location() const noexcept override

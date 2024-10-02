@@ -38,7 +38,7 @@ jobs:
       - name: Install system dependencies
         run: |
           apt update &&
-          apt install pkg-config make git g++ clang -y
+          apt install pkg-config make git g++ clang doxygen graphviz -y
       - name: Build project with cmake by preset debug
         run: |
           mkdir -p .cache/cpm/source &&

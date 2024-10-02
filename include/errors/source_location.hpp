@@ -38,11 +38,15 @@
 
 namespace errors
 {
+/// @brief
+/// The source location.
 #if defined(ERRORS_USE_STD_SOURCE_LOCATION)
 using source_location = std::source_location;
 #else
 struct source_location {
     public:
+        /// @brief
+        /// Returns the current source location.
 #if defined(ERRORS_SOURCE_LOCATION_HAS_BUILTIN_FILE) &&         \
         defined(ERRORS_SOURCE_LOCATION_HAS_BUILTIN_FUNCTION) && \
         defined(ERRORS_SOURCE_LOCATION_HAS_BUILTIN_LINE) &&     \
@@ -75,21 +79,31 @@ struct source_location {
 
         constexpr source_location() noexcept = default;
 
+        /// @brief
+        /// Returns the file name,
+        /// or "unsupported" if it is not supported by the compiler.
         constexpr const char *file_name() const noexcept
         {
                 return file_name_;
         }
 
+        /// @brief
+        /// Returns the function name.
         constexpr const char *function_name() const noexcept
         {
                 return function_name_;
         }
 
+        /// @brief
+        /// Returns the line number.
         constexpr uint_least32_t line() const noexcept
         {
                 return line_number;
         }
 
+        /// @brief
+        /// Returns the column number,
+        /// or 0 if it is not supported by the compiler
         constexpr std::uint_least32_t column() const noexcept
         {
                 return column_;
