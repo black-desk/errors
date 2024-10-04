@@ -1,0 +1,13 @@
+<map id="errors::error" name="errors::error">
+<area shape="rect" id="node1" title="Interface representing an error." alt="" coords="120,80,229,107"/>
+<area shape="rect" id="node3" href="$classerrors_1_1impl_1_1base__error.html" title="A base error class." alt="" coords="101,155,248,196"/>
+<area shape="rect" id="node2" href="$classerrors_1_1detail_1_1interface.html" title="This is the abstract class for all interface type. Disable copy and move operations." alt="" coords="83,5,266,32"/>
+<area shape="rect" id="node4" href="$classerrors_1_1impl_1_1error__with__cause.html" title="A base error class." alt="" coords="13,244,163,285"/>
+<area shape="rect" id="node6" href="$classerrors_1_1impl_1_1error__without__cause.html" title="A base error class." alt="" coords="194,244,345,285"/>
+<area shape="rect" id="node5" href="$classerrors_1_1impl_1_1wrap__error.html" title="An error which wraps another error." alt="" coords="5,333,155,375"/>
+<area shape="rect" id="node7" href="$classerrors_1_1impl_1_1exception__error.html" title="An error that has an exception." alt="" coords="179,333,359,375"/>
+<area shape="rect" id="node8" href="$classerrors_1_1impl_1_1runtime__error.html" title="An error that has a message." alt="" coords="384,333,552,375"/>
+<area shape="rect" id="node9" href="$classerrors_1_1impl_1_1code__error.html" title=" " alt="" coords="309,423,456,464"/>
+<area shape="rect" id="node11" href="$classerrors_1_1impl_1_1code__error.html" title="An error that has a code." alt="" coords="480,423,627,464"/>
+<area shape="rect" id="node10" href="$classerrors_1_1impl_1_1system__error.html" title="An error that has a system error code." alt="" coords="301,512,465,553"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classerrors_1_1detail_1_1interface.html" title="This is the abstract class for all interface type. Disable copy and move operations." alt="" coords="5,46,188,73"/>
+<area shape="rect" id="node2" href="$classerrors_1_1error.html" title="Interface representing an error." alt="" coords="236,46,345,73"/>
+<area shape="rect" id="node3" href="$classerrors_1_1impl_1_1base__error.html" title="A base error class." alt="" coords="393,39,540,80"/>
+<area shape="rect" id="node4" href="$classerrors_1_1impl_1_1error__with__cause.html" title="A base error class." alt="" coords="588,5,739,47"/>
+<area shape="rect" id="node6" href="$classerrors_1_1impl_1_1error__without__cause.html" title="A base error class." alt="" coords="588,71,739,112"/>
+<area shape="rect" id="node5" href="$classerrors_1_1impl_1_1wrap__error.html" title="An error which wraps another error." alt="" coords="802,5,951,47"/>
+<area shape="rect" id="node7" href="$classerrors_1_1impl_1_1exception__error.html" title="An error that has an exception." alt="" coords="787,71,967,112"/>
+<area shape="rect" id="node8" href="$classerrors_1_1impl_1_1runtime__error.html" title="An error that has a message." alt="" coords="793,136,961,177"/>
+<area shape="rect" id="node9" href="$classerrors_1_1impl_1_1code__error.html" title=" " alt="" coords="1015,103,1161,144"/>
+<area shape="rect" id="node11" href="$classerrors_1_1impl_1_1code__error.html" title="An error that has a code." alt="" coords="1015,168,1161,209"/>
+<area shape="rect" id="node10" href="$classerrors_1_1impl_1_1system__error.html" title="An error that has a system error code." alt="" coords="1209,103,1373,144"/>
+</map>
