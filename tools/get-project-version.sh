@@ -65,7 +65,7 @@ function main() {
 
 	BUILD_DIR=../build_get-project-version
 
-	configure_cmake_project .. $BUILD_DIR >&2
+	configure_cmake_project .. $BUILD_DIR -Derrors_GENERATE_DOCUMENTATION=OFF >&2
 	cd $BUILD_DIR
 	version=$(cmake --system-information | awk -F= '$1~/CMAKE_PROJECT_VERSION:STATIC/{print$2}')
 	if [ -z "$version" ]; then
