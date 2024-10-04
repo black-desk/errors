@@ -77,3 +77,16 @@ function configure_cmake_project() {
 
 	run_in_directory "$binary_dir" cmake "$source_dir" "$@"
 }
+
+# This function builds a CMake project.
+#
+# Arguments:
+#  $1 - The directory where the build is located.
+#  $@ - Additional arguments to pass to the cmake --build command.
+function build_cmake_project() {
+	local binary_dir
+	binary_dir="$(get_absolute_path "$1")"
+	shift
+
+	run_in_directory "$binary_dir" cmake --build . "$@"
+}
