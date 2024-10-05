@@ -98,4 +98,8 @@ BUILD_DIR="../build_generate-release-assets"
 
 configure_cmake_project .. $BUILD_DIR -DCMAKE_BUILD_TYPE=Release >&2
 
+cd "$BUILD_DIR"
+
+../tools/amalgamate.py -c ../tools/errors.json -s .
+
 realpath "$BUILD_DIR"/errors.hpp

@@ -96,10 +96,12 @@ pfl_add_library(
   include/errors/impl/base_error.hpp
   include/errors/impl/code_error.hpp
   include/errors/impl/error_with_cause.hpp
+  include/errors/impl/error_without_cause.hpp
   include/errors/impl/exception_error.hpp
   include/errors/impl/runtime_error.hpp
   include/errors/impl/system_error.hpp
   include/errors/impl/wrap_error.hpp
+  include/errors/json.hpp
   include/errors/make.hpp
   include/errors/source_location.hpp
   include/errors/utils.hpp
@@ -112,12 +114,13 @@ pfl_add_library(
   src/errors/errors.cpp
   src/errors/impl/base_error.cpp
   src/errors/impl/code_error.cpp
-  src/errors/impl/error_without_cause.cpp
   src/errors/impl/error_with_cause.cpp
+  src/errors/impl/error_without_cause.cpp
   src/errors/impl/exception_error.cpp
   src/errors/impl/runtime_error.cpp
   src/errors/impl/system_error.cpp
   src/errors/impl/wrap_error.cpp
+  src/errors/json.cpp
   src/errors/make.cpp
   src/errors/source_location.cpp
   src/errors/utils.cpp

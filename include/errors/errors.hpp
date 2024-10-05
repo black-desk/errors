@@ -1,5 +1,6 @@
 #pragma once
 
+#include "errors/config.hpp"
 #include "errors/error.hpp"
 #include "errors/error_ptr.hpp"
 #include "errors/impl/base_error.hpp"
@@ -12,7 +13,12 @@
 #include "errors/make.hpp"
 #include "errors/source_location.hpp"
 #include "errors/utils.hpp"
+#include "errors/version.hpp"
 #include "errors/wrap.hpp"
+
+#if defined(ERRORS_ENABLE_NLOHMANN_JSON_SUPPORT)
+#include "errors/json.hpp"
+#endif
 
 // Generate main page for the reference documentation.
 

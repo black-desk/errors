@@ -1,0 +1,8 @@
+{
+	"project": "Go-like error handling library for C++11",
+	"target": "errors.hpp",
+	"sources": [
+		"../include/errors/errors.hpp"
+	],
+	"include_paths": ["../include", "include"]
+}
