@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['with_0',['with',['../structmake_1_1with.html',1,'make']]],
-  ['wrap_1',['wrap',['../classerrors_1_1wrap.html',1,'errors']]],
-  ['wrap_5ferror_2',['wrap_error',['../classerrors_1_1impl_1_1wrap__error.html',1,'errors::impl']]]
+  ['source_5flocation_0',['source_location',['../structerrors_1_1source__location.html',1,'errors']]],
+  ['system_5ferror_1',['system_error',['../classerrors_1_1impl_1_1system__error.html',1,'errors::impl']]]
 ];
