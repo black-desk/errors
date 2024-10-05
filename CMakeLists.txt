@@ -19,7 +19,7 @@ endif()
 
 project(
   errors
-  VERSION 0.5.0
+  VERSION 0.6.0
   DESCRIPTION ""
   HOMEPAGE_URL "https://github.com/black-desk/errors"
   LANGUAGES CXX)
