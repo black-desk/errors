@@ -102,6 +102,6 @@ configure_cmake_project .. $BUILD_DIR \
 
 cd "$BUILD_DIR"
 
-../tools/amalgamate.py -c ../tools/errors.json -s .
+../tools/amalgamate.py -c ../tools/errors.json -s . >&2
 
 realpath "$BUILD_DIR"/errors.hpp
