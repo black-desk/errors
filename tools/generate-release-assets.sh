@@ -96,7 +96,9 @@ check_ci
 
 BUILD_DIR="../build_generate-release-assets"
 
-configure_cmake_project .. $BUILD_DIR -DCMAKE_BUILD_TYPE=Release >&2
+configure_cmake_project .. $BUILD_DIR \
+	-Derrors_GENERATE_DOCUMENTATION=OFF \
+	-DCMAKE_BUILD_TYPE=Release >&2
 
 cd "$BUILD_DIR"
 
