@@ -3,9 +3,10 @@ cmake_minimum_required(VERSION 3.11.4) # for RHEL 8
 # Let's place extra cmake scripts in /cmake directory
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-# Use this command to update PFL.cmake from GitHub release page: wget -O
-# cmake/PFL.cmake
-# https://github.com/black-desk/PFL.cmake/releases/latest/download/PFL.cmake
+# Use this command to update PFL.cmake from GitHub release page:
+#[[
+wget -O cmake/PFL.cmake https://github.com/black-desk/PFL.cmake/releases/latest/download/PFL.cmake
+]]
 include(PFL)
 
 set(ENABLE_CPM YES)
@@ -24,9 +25,10 @@ project(
   HOMEPAGE_URL "https://github.com/black-desk/errors"
   LANGUAGES CXX)
 
-# Use this command to update GitSemver.cmake from GitHub release page: wget -O
-# cmake/GitSemver.cmake
-# https://github.com/black-desk/GitSemver.cmake/releases/latest/download/GitSemver.cmake
+# Use this command to update GitSemver.cmake from GitHub release page:
+#[[
+wget -O cmake/GitSemver.cmake https://github.com/black-desk/GitSemver.cmake/releases/latest/download/GitSemver.cmake
+]]
 include(GitSemver)
 gitsemver(PROJECT_VERSION)
 
