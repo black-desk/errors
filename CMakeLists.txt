@@ -41,6 +41,7 @@ option(errors_WITH_TL_EXPECTED
        ${PROJECT_IS_TOP_LEVEL})
 option(errors_GENERATE_DOCUMENTATION "Generate documentation"
        ${PROJECT_IS_TOP_LEVEL})
+option(errors_COVERAGE "Link library with --coverage" OFF)
 
 macro(cpm_add_dependencies)
   if(errors_WITH_NLOHMANN_JSON)
@@ -84,6 +85,11 @@ if(NOT ENABLE_CPM)
 else()
   include(CPM)
   cpm_add_dependencies()
+endif()
+
+if(errors_COVERAGE)
+  set(COMPILE_OPTIONS INTERFACE --coverage)
+  set(LINK_OPTIONS INTERFACE --coverage)
 endif()
 
 pfl_add_library(
@@ -136,6 +142,10 @@ pfl_add_library(
   use-with-expected
   TESTS
   errors-unit-tests
+  COMPILE_OPTIONS
+  ${COMPILE_OPTIONS}
+  LINK_OPTIONS
+  ${LINK_OPTIONS}
   COMPILE_FEATURES
   INTERFACE
   cxx_std_11)

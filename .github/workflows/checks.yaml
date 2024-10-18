@@ -1,6 +1,11 @@
 name: Checks
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - master
+      - release/*
+  pull_request:
 
 jobs:
   checks:
@@ -28,23 +33,49 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Cache CPM.cmake Source
-        uses: actions/cache@v4
-        with:
-          path: .cache/cpm/source
-          key: ${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v2.0
       - name: Install system dependencies
         run: |
           apt update &&
-          apt install pkg-config make git g++ clang doxygen graphviz -y
-      - name: Build project with cmake by preset debug
+          apt install -y \
+            clang \
+            doxygen \
+            g++ \
+            git \
+            graphviz \
+            lcov \
+            make \
+            pkg-config \
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.container }}-${{ matrix.cxx }}
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2.0
+      - name: Setup CPM_SOURCE_CACHE
         run: |
-          mkdir -p .cache/cpm/source &&
+          export CPM_SOURCE_CACHE="${XDG_CACHE_HOME:-${HOME}/.cache}/CPM" &&
+          mkdir -p "$CPM_SOURCE_CACHE" &&
+          echo "CPM_SOURCE_CACHE=$CPM_SOURCE_CACHE" >> "$GITHUB_ENV"
+      - name: Cache CPM.cmake Source
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CPM_SOURCE_CACHE }}
+          key: ${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+      - name: Build project with cmake by preset CI
+        run: |
+          export CMAKE_CXX_COMPILER_LAUNCHER=ccache &&
           export CXX="${{ matrix.cxx }}" &&
-          export CPM_SOURCE_CACHE="$PWD/.cache/cpm/source" &&
-          cmake --workflow --preset default
+          cmake --workflow --preset CI
+      - name: Generate coverage.info
+        if: matrix.cxx == 'g++'
+        run: |
+          ./tools/generate-coverage.sh
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.info
+          disable_search: true
   pass:
     name: Pass
     if: always()

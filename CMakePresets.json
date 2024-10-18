@@ -13,10 +13,16 @@
                         "binaryDir": "${sourceDir}/build",
                         "cacheVariables": {
                                 "CMAKE_CXX_CLANG_TIDY": "$env{CMAKE_CXX_CLANG_TIDY}",
-                                "CPM_DOWNLOAD_ALL": "ON",
-                                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Og -g -fsanitize=address,undefined",
+                                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Werror -Og -g -fsanitize=address,undefined",
                                 "CMAKE_EXPORT_COMPILE_COMMANDS": true,
                                 "CMAKE_COLOR_DIAGNOSTICS": true
+                        }
+                },
+                {
+                        "name": "CI",
+                        "inherits": "default",
+                        "cacheVariables": {
+                                "errors_COVERAGE": true
                         }
                 }
         ],
@@ -26,6 +32,10 @@
                         "displayName": "Default build",
                         "description": "Use default configuration to build `errors` for developers.",
                         "configurePreset": "default"
+                },
+                {
+                        "name": "CI",
+                        "configurePreset": "CI"
                 }
         ],
         "testPresets": [
@@ -41,6 +51,11 @@
                                 "noTestsAction": "error",
                                 "stopOnFailure": true
                         }
+                },
+                {
+                        "name": "CI",
+                        "inherits": "default",
+                        "configurePreset": "CI"
                 }
         ],
         "workflowPresets": [
@@ -60,6 +75,25 @@
                                 {
                                         "type": "test",
                                         "name": "default"
+                                }
+                        ]
+                },
+                {
+                        "name": "CI",
+                        "displayName": "CI workflow",
+                        "description": "Configure, build then test `errors` for CI.",
+                        "steps": [
+                                {
+                                        "type": "configure",
+                                        "name": "CI"
+                                },
+                                {
+                                        "type": "build",
+                                        "name": "CI"
+                                },
+                                {
+                                        "type": "test",
+                                        "name": "CI"
                                 }
                         ]
                 }
