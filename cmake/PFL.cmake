@@ -29,7 +29,7 @@ For futher information, check [examples] and [documents].
 
 [PFL.cmake]: https://github.com/black-desk/PFL.cmake/releases/latest/download/PFL.cmake
 
-[the Pitchfork layout]: https://github.com/vector-of-bool/pitchfork/blob/develop/data/spec.bs
+[the Pitchfork layout]: https://black-desk.github.io/pages/pintchfork-layout.html
 
 [examples]: https://github.com/black-desk/PFL.cmake/tree/master/examples
 
@@ -101,7 +101,7 @@ function(_pfl_fatal)
   _pfl_message(FATAL_ERROR ${ARGV})
 endfunction()
 
-set(_PFL_VERSION "v0.6.1")
+set(_PFL_VERSION "v0.6.2")
 
 _pfl_info("Version: ${_PFL_VERSION}")
 
@@ -509,6 +509,10 @@ macro(_pfl_add_target_common)
     target_compile_options(${TARGET} ${PFL_ARG_COMPILE_OPTIONS})
   endif()
 
+  if(DEFINED PFL_ARG_LINK_OPTIONS)
+    target_link_options(${TARGET} ${PFL_ARG_LINK_OPTIONS})
+  endif()
+
   if(DEFINED PFL_ARG_DEPENDENCIES)
     foreach(DEPENDENCY ${PFL_ARG_DEPENDENCIES})
       if("${DEPENDENCY}" STREQUAL "PUBLIC" OR "${DEPENDENCY}" STREQUAL
@@ -648,7 +652,9 @@ function(pfl_add_library)
       # Arguments passed to target_compile_features().
       COMPILE_FEATURES
       # Arguments passed to target_compile_options().
-      COMPILE_OPTIONS)
+      COMPILE_OPTIONS
+      # Arguments passed to target_link_options().
+      LINK_OPTIONS)
   _pfl_parse_arguments(${ARGN})
   _pfl_current_compoent()
 
@@ -922,7 +928,9 @@ function(PFL_add_executable)
       # Arguments passed to target_compile_features().
       COMPILE_FEATURES
       # Arguments passed to target_compile_options().
-      COMPILE_OPTIONS)
+      COMPILE_OPTIONS
+      # Arguments passed to target_link_options().
+      LINK_OPTIONS)
   _pfl_parse_arguments(${ARGN})
   _pfl_current_compoent()
 
