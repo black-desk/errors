@@ -1,5 +1,6 @@
 # `errors`: a header-only golang-like error wrapping library for c++11
 
+[![codecov](https://codecov.io/github/black-desk/errors/graph/badge.svg?token=QM9XK2OX15)](https://codecov.io/github/black-desk/errors)
 ![](https://img.shields.io/github/check-runs/black-desk/errors/master)
 ![](https://img.shields.io/github/commit-activity/w/black-desk/errors/master)
 ![](https://img.shields.io/github/contributors/black-desk/errors)
@@ -64,9 +65,9 @@ See <https://black-desk.github.io/errors>.
 ### Basic usage
 
 This library defined an abstract class `errors::error` (see [header
-file](docs/../examples/basic-usage/../../include/errors/error.hpp)) to
-represent an error, which has some method to display error message and
-the source_location where this error is created.
+file](../../include/errors/error.hpp)) to represent an error, which has
+some method to display error message and the source_location where this
+error is created.
 
 A function or method want to return an error should return an
 `errors::error_ptr`, which is a `std::unique_ptr<error>`.
@@ -674,10 +675,16 @@ The configuration of `default` preset is:
                         "binaryDir": "${sourceDir}/build",
                         "cacheVariables": {
                                 "CMAKE_CXX_CLANG_TIDY": "$env{CMAKE_CXX_CLANG_TIDY}",
-                                "CPM_DOWNLOAD_ALL": "ON",
-                                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Og -g -fsanitize=address,undefined",
+                                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Werror -Og -g -fsanitize=address,undefined",
                                 "CMAKE_EXPORT_COMPILE_COMMANDS": true,
                                 "CMAKE_COLOR_DIAGNOSTICS": true
+                        }
+                },
+                {
+                        "name": "CI",
+                        "inherits": "default",
+                        "cacheVariables": {
+                                "errors_COVERAGE": true
                         }
                 }
         ],
@@ -687,6 +694,10 @@ The configuration of `default` preset is:
                         "displayName": "Default build",
                         "description": "Use default configuration to build `errors` for developers.",
                         "configurePreset": "default"
+                },
+                {
+                        "name": "CI",
+                        "configurePreset": "CI"
                 }
         ],
         "testPresets": [
@@ -702,6 +713,11 @@ The configuration of `default` preset is:
                                 "noTestsAction": "error",
                                 "stopOnFailure": true
                         }
+                },
+                {
+                        "name": "CI",
+                        "inherits": "default",
+                        "configurePreset": "CI"
                 }
         ],
         "workflowPresets": [
@@ -721,6 +737,25 @@ The configuration of `default` preset is:
                                 {
                                         "type": "test",
                                         "name": "default"
+                                }
+                        ]
+                },
+                {
+                        "name": "CI",
+                        "displayName": "CI workflow",
+                        "description": "Configure, build then test `errors` for CI.",
+                        "steps": [
+                                {
+                                        "type": "configure",
+                                        "name": "CI"
+                                },
+                                {
+                                        "type": "build",
+                                        "name": "CI"
+                                },
+                                {
+                                        "type": "test",
+                                        "name": "CI"
                                 }
                         ]
                 }
