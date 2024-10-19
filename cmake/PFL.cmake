@@ -101,7 +101,7 @@ function(_pfl_fatal)
   _pfl_message(FATAL_ERROR ${ARGV})
 endfunction()
 
-set(_PFL_VERSION "v0.6.2")
+set(_PFL_VERSION "v0.7.0")
 
 _pfl_info("Version: ${_PFL_VERSION}")
 
@@ -513,6 +513,10 @@ macro(_pfl_add_target_common)
     target_link_options(${TARGET} ${PFL_ARG_LINK_OPTIONS})
   endif()
 
+  if(DEFINED PFL_ARG_PROPERTIES)
+    set_target_properties(${TARGET} PROPERTIES ${PFL_ARG_PROPERTIES})
+  endif()
+
   if(DEFINED PFL_ARG_DEPENDENCIES)
     foreach(DEPENDENCY ${PFL_ARG_DEPENDENCIES})
       if("${DEPENDENCY}" STREQUAL "PUBLIC" OR "${DEPENDENCY}" STREQUAL
@@ -654,7 +658,9 @@ function(pfl_add_library)
       # Arguments passed to target_compile_options().
       COMPILE_OPTIONS
       # Arguments passed to target_link_options().
-      LINK_OPTIONS)
+      LINK_OPTIONS
+      # Arguments passed to set_target_properties().
+      PROPERTIES)
   _pfl_parse_arguments(${ARGN})
   _pfl_current_compoent()
 
@@ -930,7 +936,9 @@ function(PFL_add_executable)
       # Arguments passed to target_compile_options().
       COMPILE_OPTIONS
       # Arguments passed to target_link_options().
-      LINK_OPTIONS)
+      LINK_OPTIONS
+      # Arguments passed to set_target_properties().
+      PROPERTIES)
   _pfl_parse_arguments(${ARGN})
   _pfl_current_compoent()
 
