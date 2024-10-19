@@ -1,5 +1,7 @@
 <map id="errors::wrap" name="errors::wrap">
-<area shape="rect" id="node1" title="A function like class to wrap an error." alt="" coords="47,155,155,181"/>
-<area shape="rect" id="node2" href="$classerrors_1_1error__ptr.html" title="Smart pointer to errors::error with some utility member functions." alt="" coords="33,80,169,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,5,196,32"/>
+<area shape="rect" id="Node000001" title="A function like class to wrap an error." alt="" coords="38,153,126,178"/>
+<area shape="rect" id="Node000002" href="$classerrors_1_1error__ptr.html" title="Smart pointer to errors::error with some utility member functions." alt="" coords="28,79,136,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,120,85,152,79,152,79,120"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,159,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="85,46,85,79,79,79,79,46"/>
 </map>

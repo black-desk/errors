@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structnlohmann_1_1adl__serializer_3_01_1_1errors_1_1source__location_01_4.html" title=" " alt="" coords="5,5,228,47"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,42,111,68"/>
+<area shape="rect" id="Node000001" href="$classerrors_1_1error__ptr.html" title="Smart pointer to errors::error with some utility member functions." alt="" coords="159,42,267,68"/>
+<area shape="poly" id="edge11_Node000000_Node000001" title=" " alt="" coords="127,52,158,52,158,58,127,58"/>
+<area shape="rect" id="Node000002" href="$structerrors_1_1make_1_1with.html" title=" " alt="" coords="315,5,443,46"/>
+<area shape="poly" id="edge12_Node000001_Node000002" title=" " alt="" coords="282,40,314,34,315,40,283,45"/>
+<area shape="rect" id="Node000003" href="$classerrors_1_1wrap.html" title="A function like class to wrap an error." alt="" coords="335,70,423,96"/>
+<area shape="poly" id="edge13_Node000001_Node000003" title=" " alt="" coords="282,64,335,73,334,78,282,69"/>
 </map>

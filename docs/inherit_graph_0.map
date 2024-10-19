@@ -1,4 +1,23 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,88,32"/>
-<area shape="rect" id="node2" href="$structmake_1_1with.html" title=" " alt="" coords="136,5,337,32"/>
+<area shape="rect" id="Node000000" href="$classerrors_1_1detail_1_1interface.html" title="This is the abstract class for all interface type. Disable copy and move operations." alt="" coords="5,46,153,72"/>
+<area shape="rect" id="Node000001" href="$classerrors_1_1error.html" title="Interface representing an error." alt="" coords="201,46,287,72"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="168,56,200,56,200,62,168,62"/>
+<area shape="rect" id="Node000002" href="$classerrors_1_1impl_1_1base__error.html" title="A base error class." alt="" coords="335,39,453,79"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="303,56,335,56,335,62,303,62"/>
+<area shape="rect" id="Node000003" href="$classerrors_1_1impl_1_1error__with__cause.html" title="A base error class." alt="" coords="501,5,618,46"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="468,41,500,35,501,40,469,47"/>
+<area shape="rect" id="Node000005" href="$classerrors_1_1impl_1_1error__without__cause.html" title="A base error class." alt="" coords="501,71,618,111"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="469,71,501,77,500,82,468,76"/>
+<area shape="rect" id="Node000004" href="$classerrors_1_1impl_1_1wrap__error.html" title="An error which wraps another error." alt="" coords="679,5,798,46"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="633,23,679,23,679,28,633,28"/>
+<area shape="rect" id="Node000006" href="$classerrors_1_1impl_1_1exception__error.html" title="An error that has an exception." alt="" coords="666,71,811,111"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="633,88,665,88,665,94,633,94"/>
+<area shape="rect" id="Node000007" href="$classerrors_1_1impl_1_1runtime__error.html" title="An error that has a message." alt="" coords="672,136,805,177"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="632,115,682,133,680,138,630,120"/>
+<area shape="rect" id="Node000008" href="$classerrors_1_1impl_1_1code__error.html" title=" " alt="" coords="859,103,977,143"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="820,139,858,131,859,137,821,144"/>
+<area shape="rect" id="Node000010" href="$classerrors_1_1impl_1_1code__error.html" title="An error that has a code." alt="" coords="859,168,977,209"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="821,168,859,175,858,180,820,174"/>
+<area shape="rect" id="Node000009" href="$classerrors_1_1impl_1_1system__error.html" title="An error that has a system error code." alt="" coords="1025,103,1158,143"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="993,120,1025,120,1025,126,993,126"/>
 </map>

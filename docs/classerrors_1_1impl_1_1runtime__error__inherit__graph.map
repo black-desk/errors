@@ -1,10 +1,17 @@
 <map id="errors::impl::runtime_error" name="errors::impl::runtime_error">
-<area shape="rect" id="node1" title="An error that has a message." alt="" coords="89,333,257,375"/>
-<area shape="rect" id="node6" href="$classerrors_1_1impl_1_1code__error.html" title=" " alt="" coords="14,423,161,464"/>
-<area shape="rect" id="node8" href="$classerrors_1_1impl_1_1code__error.html" title="An error that has a code." alt="" coords="185,423,331,464"/>
-<area shape="rect" id="node2" href="$classerrors_1_1impl_1_1error__without__cause.html" title="A base error class." alt="" coords="97,244,248,285"/>
-<area shape="rect" id="node3" href="$classerrors_1_1impl_1_1base__error.html" title="A base error class." alt="" coords="99,155,246,196"/>
-<area shape="rect" id="node4" href="$classerrors_1_1error.html" title="Interface representing an error." alt="" coords="118,80,227,107"/>
-<area shape="rect" id="node5" href="$classerrors_1_1detail_1_1interface.html" title="This is the abstract class for all interface type. Disable copy and move operations." alt="" coords="81,5,264,32"/>
-<area shape="rect" id="node7" href="$classerrors_1_1impl_1_1system__error.html" title="An error that has a system error code." alt="" coords="5,512,169,553"/>
+<area shape="rect" id="Node000001" title="An error that has a message." alt="" coords="76,330,209,371"/>
+<area shape="rect" id="Node000006" href="$classerrors_1_1impl_1_1code__error.html" title=" " alt="" coords="12,419,131,459"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="119,385,90,420,85,417,114,381"/>
+<area shape="rect" id="Node000008" href="$classerrors_1_1impl_1_1code__error.html" title="An error that has a code." alt="" coords="155,419,273,459"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="170,381,200,417,196,420,166,385"/>
+<area shape="rect" id="Node000002" href="$classerrors_1_1impl_1_1error__without__cause.html" title="A base error class." alt="" coords="84,241,200,282"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,298,145,330,140,330,140,298"/>
+<area shape="rect" id="Node000003" href="$classerrors_1_1impl_1_1base__error.html" title="A base error class." alt="" coords="83,153,201,193"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="145,209,145,241,140,241,140,209"/>
+<area shape="rect" id="Node000004" href="$classerrors_1_1error.html" title="Interface representing an error." alt="" coords="99,79,185,105"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="145,120,145,152,140,152,140,120"/>
+<area shape="rect" id="Node000005" href="$classerrors_1_1detail_1_1interface.html" title="This is the abstract class for all interface type. Disable copy and move operations." alt="" coords="68,5,216,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="145,46,145,79,140,79,140,46"/>
+<area shape="rect" id="Node000007" href="$classerrors_1_1impl_1_1system__error.html" title="An error that has a system error code." alt="" coords="5,507,138,548"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="74,475,74,507,69,507,69,475"/>
 </map>
