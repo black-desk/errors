@@ -17,7 +17,14 @@ pfl_add_executable(
   LINK_LIBRARIES
   ${link_libraries}
   COMPILE_OPTIONS
-  ${compile_options})
+  ${compile_options}
+  PROPERTIES
+  CXX_STANDARD
+  17
+  CXX_STANDARD_REQUIRED
+  ON
+  CXX_EXTENSIONS
+  OFF)
 
 add_test(NAME run-examples_customize-format-local
          COMMAND customize-format-local)

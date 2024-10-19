@@ -13,4 +13,4 @@ The error handling mechanism based on returned errors
 in Golang (https://pkg.go.dev/errors)
 has become quite usable after some time of development.
 
-So let's bring the mechanism to c++11.
+So let's bring the mechanism to c++.

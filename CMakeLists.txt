@@ -148,7 +148,7 @@ pfl_add_library(
   ${LINK_OPTIONS}
   COMPILE_FEATURES
   INTERFACE
-  cxx_std_11)
+  cxx_std_17)
 
 if(errors_GENERATE_DOCUMENTATION)
   find_package(Doxygen REQUIRED COMPONENTS dot OPTIONAL_COMPONENTS mscgen dia)
