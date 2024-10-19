@@ -86,6 +86,7 @@ function main() {
 
 	lcov --capture \
 		--directory . \
+		--branch-coverage \
 		--rc geninfo_unexecuted_blocks=1 \
 		--output-file "$coverage_info_file"
 	lcov --remove "$coverage_info_file" \
