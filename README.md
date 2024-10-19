@@ -1,4 +1,4 @@
-# `errors`: a header-only golang-like error wrapping library for c++11
+# `errors`: a header-only golang-like error wrapping library for c++
 
 [![codecov](https://codecov.io/github/black-desk/errors/graph/badge.svg?token=QM9XK2OX15)](https://codecov.io/github/black-desk/errors)
 ![](https://img.shields.io/github/check-runs/black-desk/errors/master)
@@ -9,7 +9,7 @@
 ![](https://img.shields.io/github/license/black-desk/errors)
 
 This library aims to bring golang-like error wrapping and handling to
-c++11.
+c++.
 
 ---------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ The error handling mechanism based on returned errors in Golang
 (https://pkg.go.dev/errors) has become quite usable after some time of
 development.
 
-So let’s bring the mechanism to c++11.
+So let’s bring the mechanism to c++.
 
 ## Reference
 
@@ -675,7 +675,7 @@ The configuration of `default` preset is:
                         "binaryDir": "${sourceDir}/build",
                         "cacheVariables": {
                                 "CMAKE_CXX_CLANG_TIDY": "$env{CMAKE_CXX_CLANG_TIDY}",
-                                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Werror -Og -g -fsanitize=address,undefined",
+                                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Werror -O0 -g3 -fsanitize=address,undefined",
                                 "CMAKE_EXPORT_COMPILE_COMMANDS": true,
                                 "CMAKE_COLOR_DIAGNOSTICS": true
                         }
