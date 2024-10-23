@@ -65,9 +65,9 @@ See <https://black-desk.github.io/errors>.
 ### Basic usage
 
 This library defined an abstract class `errors::error` (see [header
-file](../../include/errors/error.hpp)) to represent an error, which has
-some method to display error message and the source_location where this
-error is created.
+file](docs/../examples/basic-usage/../../include/errors/error.hpp)) to
+represent an error, which has some method to display error message and
+the source_location where this error is created.
 
 A function or method want to return an error should return an
 `errors::error_ptr`, which is a `std::unique_ptr<error>`.
@@ -126,6 +126,14 @@ int main()
         std::cerr << "Error in JSON:" << std::endl
                   << nlohmann::json(err) << std::endl;
 #endif
+
+        // NOTE:
+        // This will print something like:
+        // ```
+        // Error: no error
+        // ```
+        err = nullptr;
+        std::cerr << "Error: " << err << std::endl;
 
         return 0;
 }
