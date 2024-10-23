@@ -52,5 +52,13 @@ int main()
                   << nlohmann::json(err) << std::endl;
 #endif
 
+        // NOTE:
+        // This will print something like:
+        // ```
+        // Error: no error
+        // ```
+        err = nullptr;
+        std::cerr << "Error: " << err << std::endl;
+
         return 0;
 }
