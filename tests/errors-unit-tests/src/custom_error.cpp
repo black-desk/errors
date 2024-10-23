@@ -6,6 +6,7 @@ namespace
 {
 using ::errors::error_ptr;
 using ::errors::source_location;
+using errors::impl::exception_error;
 using ::errors::impl::runtime_error;
 using ::errors::impl::wrap_error;
 
@@ -45,6 +46,9 @@ TEST_CASE("custom error works", "[errors][source_location]")
         auto current_err = fn(3);
 
         REQUIRE(current_err != nullptr);
+
+        REQUIRE(!current_err.is<exception_error>());
+
         REQUIRE(current_err->what() != nullptr);
         REQUIRE_THAT(current_err->what(), Equals("[depth=3]"));
         REQUIRE(current_err.as<fn_error_t>() != nullptr);
