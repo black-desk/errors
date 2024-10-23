@@ -92,7 +92,21 @@ TEST_CASE("exception_error works", "[errors]")
                 auto err = errors::make<exception_error>::with();
                 REQUIRE(err != nullptr);
                 REQUIRE_THAT(err->what(), Equals("error"));
+                REQUIRE(err->cause() == nullptr);
+                REQUIRE(std::move(*err).cause() == nullptr);
         }
+
+        try {
+                throw "error";
+        } catch (...) {
+                auto err = errors::make<exception_error>::with();
+                REQUIRE(err != nullptr);
+                REQUIRE_THAT(err->what(), Equals("Unknown exception"));
+        }
+
+        auto err = errors::make<exception_error>::with();
+        REQUIRE(err != nullptr);
+        REQUIRE_THAT(err->what(), Equals(""));
 }
 
 TEST_CASE("system_error works", "[errors]")
